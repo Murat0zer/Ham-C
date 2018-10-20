@@ -1,0 +1,79 @@
+
+options {
+  DEBUG_PARSER = false; // Set to false to turn off token printing
+}
+
+PARSER_BEGIN(Parser)
+  class Parser {
+    public static void main(String args[]) throws ParseException {
+      new Parser(System.in).Start();
+    }
+  }
+PARSER_END(Parser)
+
+TOKEN : {
+   < SEMI: ";" >
+ | < ASGN: "=" >
+ | < PRINT: "print" >
+ | < LPAR: "(" >
+ | < RPAR: ")" >
+ | < PLUS: "+" >
+ | < MINUS: "-" >
+ | < TIMES: "*" >
+ | < DIVIDE: "/" >
+ | < MOD: "%" >
+ | < POWER: "^" >
+ | < #DIGIT: ["0"-"9"] >
+ | < ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z"] | <DIGIT>)* >
+ | < NUM: (<DIGIT>)+ >
+}
+
+SKIP: {
+   < "--" (~["\n", "\r"])* ("\n" | "\r" | "\r\n") >
+ | " "
+ | "\t"
+ | "\n"
+ | "\r"
+}
+
+void Start() :
+{ }
+{
+  ( Eq() )* <EOF>
+}
+
+void Eq() :
+{ }
+{
+  <ID> ( <LPAR> V() <RPAR> )? <ASGN> E() (<SEMI>)+
+}
+
+void V() :
+{ }
+{
+  <ID> | <NUM>
+}
+
+void E() :
+{ }
+{
+ T() ( (<PLUS> | <MINUS>) T() )*
+}
+
+void T() :
+{ }
+{
+ P() ( (<TIMES> | <DIVIDE> | <MOD>) P() )*
+}
+
+void P() :
+{ }
+{
+  F() ( <POWER> P() )?
+}
+
+void F() :
+{ }
+{
+  <ID> ( <LPAR> E() <RPAR> )? | <NUM>
+}
