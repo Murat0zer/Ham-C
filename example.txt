@@ -1,0 +1,13 @@
+
+
+bool flag = true;
+
+int counter = 2;
+
+
+
+int main(void){
+
+    print("123");
+
+}

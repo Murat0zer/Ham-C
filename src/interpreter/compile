@@ -1,0 +1,5 @@
+#!/bin/bash
+
+javacc Grammar.jj
+javac *.java
+java Parser < ../../example.txt

@@ -1,0 +1,487 @@
+options {
+	//DEBUG_PARSER = false;
+}
+
+
+PARSER_BEGIN(Parser)
+package interpreter;
+public class Parser {
+	public static void main(String args[]) throws ParseException {
+
+		try {
+			Parser parser = new Parser(System.in);
+			parser.start();
+		}
+
+		catch (Exception e) {
+		    System.out.println(e.getMessage());
+			throw new Error("Parsing isleminde hata !");
+		}
+	}
+}
+
+PARSER_END(Parser)
+
+/* WHITE SPACE */
+
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+
+TOKEN : {
+
+	< IF : "if" >
+|	< ELSE : "else" >
+|	< FOR : "for" >
+|	< WHILE : "while" >
+|	< DO : "do" >
+|	< SWITCH : "switch" >
+|	< CASE : "case" >
+|	< DEFAULT_ : "default" >
+|	< BREAK : "break" >
+|	< CONTINUE : "continue" >
+|	< STRUCT : "struct" >
+|	< RETURN : "return" >
+|	< CONST : "const" >
+|	< TRUE : "true" >
+|	< FALSE : "false" >
+|	< VOID : "void" >
+|	< INT : "int" >
+|	< BOOL : "bool" >
+|	< DOUBLE : "double" >
+|	< STRING : "string" >
+|	< LPAREN : "(" >
+|	< RPAREN : ")" >
+|	< LBRACK : "[" >
+|	< RBRACK : "]" >
+|	< LBRACE : "{" >
+|	< RBRACE : "}" >
+|	< SEMI : ";" >
+|	< COMMA : "," >
+|	< COLON : ":" >
+|	< DOT : "." >
+|	< PLUS : "+" >
+|	< MINUS : "-" >
+|	< TIMES : "*" >
+|	< DIVIDE : "/" >
+|	< MODULO : "%" >
+|	< POWER : "^" >
+|	< ASSIGN : "=" >
+|	< AND : "&&" >
+|	< OR : "||" >
+|	< NOT : "!" >
+|	< EQUAL : "==" >
+|	< NOTEQUAL : "!=" >
+|	< LESSTHAN : "<" >
+|	< GREATERTHAN : ">" >
+|	< LESSEQUAL : "<=" >
+|	< GREATEREQUAL : ">=" >
+|   < PRINT: "print" >
+|	< #LETTER : ["a"-"z", "A"-"Z", "_"] >
+|	< #DIGIT : ["0"-"9"] >
+|	< #SIGN : ["+", "-"] >
+|	< #EXPONENT : ["e", "E"] (["+", "-"])? (<DIGIT>)+ >
+|	< ID : <LETTER> (<LETTER> | <DIGIT>)* >
+|	< INTCONST : (<SIGN>)? (<DIGIT>)+ >
+|	< DOUBLECONST : (<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT>)?
+		| "." (<DIGIT>)+ (<EXPONENT>)?
+		| (<DIGIT>)+ <EXPONENT> >
+|	< STRCONST : "\"" ( (~["\"", "\n", "\r", "\\"]) | "\\" (["n", "t", "b", "r", "f", "\\", "'", "\""]) )* "\"" >
+
+}
+
+AbstractGlobalScopeUnit start() :
+{ AbstractGlobalScopeUnit abstractGlobalScopeUnit; }
+{
+  (
+     abstractGlobalScopeUnit =  globalScopeUnit()
+
+  )+
+   <EOF> { return abstractGlobalScopeUnit; }
+}
+
+AbstractGlobalScopeUnit globalScopeUnit() :
+{ AbstractGlobalScopeUnit globalScopeUnit; }
+{
+
+        LOOKAHEAD(3)
+        globalScopeUnit = globalVariableDeclaration() |
+        globalScopeUnit = structDeclaration()  |
+        globalScopeUnit = functionDeclaration()
+
+
+	{ return globalScopeUnit; }
+}
+
+
+AbstractGlobalScopeUnit functionDeclaration() :
+{ javaCC.Token t; java.util.List parameterList; Stm s; String returnType; }
+{
+	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> s = compoundStatement()
+
+    { return new FunctionDeclaration(returnType, t.image, parameterList, s );  }
+}
+
+String returnType() :
+{ Token t; String returnType; }
+{
+	t = <VOID> { return t.image; } | returnType = type()
+
+	{ return returnType; }
+}
+
+String type() :
+{ Token t; }
+{
+	    t = <INT> { return t.image; }
+	|   <DOUBLE>
+	|   <BOOL>
+	|   t = <STRING> { return t.image; }
+	|   <ID>
+
+	{ return t.image; }
+
+}
+
+java.util.List parameterList() :
+{ java.util.List<Variable> parameterList; }
+{
+	<VOID> | parameterList = formalList() { return parameterList; }
+
+}
+
+java.util.List formalList() :
+{ Token t; String type; java.util.List<Variable> parameterList = new java.util.ArrayList(); }
+{
+	(<COMMA> (<CONST>)? type = type() t = <ID> { parameterList.add(new Variable(type, t.image)); })*
+
+		{ return parameterList; }
+}
+
+StructDeclaration structDeclaration() :
+{}
+{
+	<STRUCT> <ID> <LBRACE> structMemberDeclarations() <RBRACE> <SEMI>
+
+	{ return null; }
+
+}
+
+void structMemberDeclarations() :
+{}
+{
+	type() <ID> <SEMI> (type() <ID> <SEMI>)*
+
+		{ return null; }
+
+}
+
+GlobalVariableDeclaration globalVariableDeclaration() :
+{ String type; Token t; String id; String value; GlobalVariableDeclaration globalVariableDeclaration; }
+{
+	(<CONST>)? type = type() t = <ID> <ASSIGN> initializer() <SEMI>
+
+	{ return "a"; }
+}
+
+void initializer() :
+{}
+{
+	simpleInitializer() | <LBRACE> structInitializer() <RBRACE>
+}
+
+StrConst simpleInitializer() :
+{ Token t;}
+{
+	<INTCONST> | <DOUBLECONST> | <TRUE> | <FALSE> | t = <STRCONST> { return new StrConst(t.image); }
+}
+
+void structInitializer() :
+{}
+{
+	initializer() (<COMMA> initializer())*
+}
+
+Stm compoundStatement() :
+{Stm s1,s2;}
+{
+	<LBRACE>
+	    s1 = statementList()
+	    ( s2=compoundStatement() { s1 = new StmList(s1, s2); } )?
+    <RBRACE>
+
+    { return s1; }
+}
+
+Stm statementList() :
+{Stm s1; }
+{
+	(LOOKAHEAD(2) s1 = statement() { return s1; })+
+}
+
+Stm statement() :
+{Stm stm;}
+{
+	LOOKAHEAD(2)
+	variableDeclarationStatement() | expressionOrAssignmentStatement() | selectionStatement() | compoundStatement()
+	| iterationStatement() | returnStatement() | breakStatement() | continueStatement()
+	| stm = printStatement() { return stm; }
+
+}
+
+void expressionOrAssignmentStatement() :
+{}
+{
+	(expression() (<ASSIGN> expression())?)? <SEMI>
+}
+
+/*
+void assignmentStatement() :
+{}
+{
+	<ID> <ASSIGN> expression() <SEMI>
+}
+
+*/
+
+
+/*
+void expressionStatement() :
+{}
+{
+	expression() <SEMI> | <SEMI>
+}
+*/
+
+
+
+void variableDeclarationStatement() :
+{}
+{
+	(<CONST>)? type() <ID> (<ASSIGN> expression())? <SEMI>
+}
+
+
+void selectionStatement() :
+{}
+{
+	ifStatement() | switchStatement()
+}
+
+void ifStatement() :
+{}
+{
+	<IF> <LPAREN> expression() <RPAREN> statement() (LOOKAHEAD(1) <ELSE> statement())?
+}
+
+
+void switchStatement() :
+{}
+{
+	<SWITCH> <LPAREN> expression() <RPAREN> <LBRACE> switchBlock() <RBRACE>
+}
+
+void switchBlock() :
+{}
+{
+	labelBlock() (labelBlock())*
+}
+
+void labelBlock() :
+{}
+{
+	<CASE> constExpression() <COLON> labelStatement() | <DEFAULT_> <COLON> labelStatement()
+}
+
+void labelStatement() :
+{}
+{
+	(statementList())?
+}
+
+void constExpression() :
+{}
+{
+	<INTCONST> | <DOUBLECONST> | <TRUE> | <FALSE> | <STRCONST>
+}
+
+void iterationStatement() :
+{}
+{
+	<WHILE> <LPAREN> expression() <RPAREN> statement()
+	| <DO> statement() <WHILE> <LPAREN> expression() <RPAREN> <SEMI>
+	| <FOR> <LPAREN> (expression())? <SEMI> (expression())? <SEMI> (expression())? <RPAREN> statement()
+}
+
+void returnStatement() :
+{}
+{
+	<RETURN> (expression())? <SEMI>
+}
+
+void breakStatement() :
+{}
+{
+	<BREAK> <SEMI>
+}
+
+void continueStatement() :
+{}
+{
+	<CONTINUE> <SEMI>
+}
+
+Stm printStatement() :
+{Exp e; Token t;}
+{
+    <PRINT> <LPAREN> e=expression() <RPAREN> <SEMI> { return new Print(e); }
+
+}
+
+Exp expression() :
+{ Exp e; }
+{
+	e = logicalOr() { return e; }
+}
+
+Exp logicalOr() :
+{ Exp e1, e2; }
+{
+	e1 = logicalAnd()
+	(
+	    <OR>  e2 = logicalAnd() { return new LogicalOR(e1, e2); }
+	)*
+	{ return e1; }
+}
+
+Exp logicalAnd() :
+{ Exp e1, e2; }
+{
+	e1 = equalityExpression()
+	(
+	    <AND> e2 = equalityExpression() { return new LogicalAND(e1, e2); }
+	)*
+
+	{ return e1; }
+}
+
+Exp equalityExpression() :
+//{}
+//{
+//	relationalExpression() ((<EQUAL> | <NOTEQUAL>) relationalExpression())*
+//}
+
+{ Exp e1, e2; Token t; }
+{
+	e1 = relationalExpression()
+	(
+	    (t = <EQUAL> | t = <NOTEQUAL>)
+	    e2 = relationalExpression() { return new EqualityExpression(e1, e2, t.image); }
+	)*
+
+	{ return e1; }
+}
+
+Exp relationalExpression() :
+{ Exp e1,e2; Token t; }
+{
+	e1 = additiveExpression()
+	(
+	    (t = <LESSTHAN> |t = <LESSEQUAL> |t = <GREATERTHAN> |t = <GREATEREQUAL>)
+	    e2 = additiveExpression() { return new RelationalExpression(e1, e2, t.image); }
+	)*
+	{ return e1; }
+}
+
+Exp additiveExpression() :
+{ Exp e1,e2; Token t; }
+{
+	e1 = multiplicativeExpression()
+	(
+	    ( t = <PLUS> | t =  <MINUS>)
+	    e2 = multiplicativeExpression()  { return new AdditiveExpression(e1, e2, t.image); }
+	)*
+	{ return e1; }
+}
+
+Exp multiplicativeExpression() :
+{ Exp e1,e2; Token t; }
+{
+	e1 = exponentialExpression()
+	(
+	    ( t = <TIMES> | t =  <DIVIDE>)
+	    e2 = exponentialExpression()  { return new MultiplicativeExpression(e1, e2, t.image); }
+	)*
+	{ return e1; }
+}
+
+Exp exponentialExpression() :
+{ Exp e1,e2; }
+{
+	e1 = unaryExpression()
+	(
+	    t= <POWER> e2 = unaryExpression() { return new ExponentialExpression(e1, e2); }
+	)*
+}
+
+Exp unaryExpression() :
+{ Exp e1; String unaryOp = null; }
+{
+	   unaryOp = unaryOperator() e1 = postfixExpression() { return new UnaryExpression(e1, unaryOp); }
+	 | e1 = postfixExpression() { return new UnaryExpression(e1, unaryOp); }
+}
+
+Exp postfixExpression() :
+{ Exp e1,e2; Token t = null;}
+{
+	e1 = primaryExpression()
+	(
+	      <LBRACK> e2 = expression() <RBRACK> { return new PostFixExpression(e1, e2, t.image); }
+	    | <DOT> t = <ID> { return new PostFixExpression(e1, e2, t.image); }
+	)*
+	{ return e1; }
+}
+
+Exp primaryExpression() :
+{Exp e1,e2; Token t;}
+{
+	   e1 = constantExpression() { return new ConstantExpression(e1); }
+	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1); }
+	 | t = <ID> e1 = primaryExpressionPrime() { return new PrimaryExpressionPrime(e1, t.image); }
+}
+
+Exp primaryExpressionPrime() :
+{ Exp e1;}
+{
+	(<LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
+}
+
+Exp expressionList() :
+{ Exp e1, e2; }
+{
+	( e1 = expression() (e2 = <COMMA> expression())* { return new ExpList(e1, e2); })?
+
+	{ return e1; }
+}
+
+Exp constantExpression() :
+{Token t;}
+{
+	  t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }
+	| t = <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); }
+	| t = <TRUE> { return new BNum(true); }
+	| t = <FALSE> { return new BNum(false); }
+	| t = <STRCONST> { return new StrConst(t.image); }
+}
+
+String unaryOperator() :
+{Token t;}
+{
+	t = <PLUS> | t=  <MINUS> | t =  <NOT>
+	{ return t.image; }
+}
