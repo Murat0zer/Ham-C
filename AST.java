@@ -1,10 +1,13 @@
-package interpreter;
+
 
 abstract class AbstractGlobalScopeUnit {
     public abstract void accept(Visitor v);
 }
 
 class GlobalVariableDeclaration extends AbstractGlobalScopeUnit {
+    AbstractGlobalScopeUnit abstractGlobalScopeUnit;
+    public GlobalVariableDeclaration() {
+    }
 
     public void accept(Visitor v) {
         v.visit(this);
@@ -12,12 +15,24 @@ class GlobalVariableDeclaration extends AbstractGlobalScopeUnit {
 }
 
 class StructDeclaration extends AbstractGlobalScopeUnit {
-
+    public StructDeclaration() {
+    }
 
     public void accept(Visitor v) {
         v.visit(this);
     }
 }
+
+class StructMemberDeclaration extends AbstractGlobalScopeUnit {
+
+    public StructMemberDeclaration() {
+    }
+
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+}
+
 
 class FunctionDeclaration extends AbstractGlobalScopeUnit {
 
@@ -31,6 +46,26 @@ class FunctionDeclaration extends AbstractGlobalScopeUnit {
         this.parameterList = parameterList;
         this.s = s;
         this.returnType = returnType;
+    }
+
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+}
+
+class SimpleInitializer extends AbstractGlobalScopeUnit {
+
+    public SimpleInitializer() {
+    }
+
+    public void accept(Visitor v) {
+        v.visit(this);
+    }
+}
+
+class StructInitializer extends AbstractGlobalScopeUnit {
+
+    public StructInitializer() {
     }
 
     public void accept(Visitor v) {
@@ -198,8 +233,10 @@ class BNum extends Exp {
 
 class PrimaryExpression extends Exp {
     Exp e1;
+    String id;
 
-    public PrimaryExpression(Exp e1) {
+    public PrimaryExpression(Exp e1, String id) {
+        this.id = id;
         this.e1 = e1;
     }
 
@@ -236,6 +273,18 @@ class IntConst extends Exp {
     }
 }
 
+class DoubleConst extends Exp {
+    double doubleConst;
+
+    public DoubleConst(double doubleValue) {
+        doubleConst = doubleValue;
+    }
+
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
 class ConstantExpression extends Exp {
 
     Exp e;
@@ -245,6 +294,7 @@ class ConstantExpression extends Exp {
     }
 
     public Object accept(Visitor v) {
+
         return v.visit(this);
     }
 
@@ -266,6 +316,12 @@ class ExpList extends Exp {
 }
 
 class PrimaryExpressionPrime extends Exp {
+
+    Exp e1;
+
+    public PrimaryExpressionPrime(Exp e1) {
+        this.e1 = e1;
+    }
 
     public Object accept(Visitor v) {
         return v.visit(this);

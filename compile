@@ -2,4 +2,4 @@
 
 javacc Grammar.jj
 javac *.java
-java Parser < ../../example.txt
+java MyInterpreter < example.txt

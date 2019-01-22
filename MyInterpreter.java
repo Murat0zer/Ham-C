@@ -1,4 +1,3 @@
-package interpreter;
 
 import java.util.Hashtable;
 
@@ -7,6 +6,7 @@ public class MyInterpreter {
     public static void main(String[] args) {
         try {
             AbstractGlobalScopeUnit abstractGlobalScopeUnit = new Parser(System.in).start();
+
             new EvalVisitor().visit(abstractGlobalScopeUnit);
 
         } catch (ParseException pe) {

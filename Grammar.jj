@@ -1,10 +1,10 @@
 options {
-	//DEBUG_PARSER = false;
+	DEBUG_PARSER = true;
 }
 
 
 PARSER_BEGIN(Parser)
-package interpreter;
+
 public class Parser {
 	public static void main(String args[]) throws ParseException {
 
@@ -110,7 +110,7 @@ AbstractGlobalScopeUnit globalScopeUnit() :
 {
 
         LOOKAHEAD(3)
-        globalScopeUnit = globalVariableDeclaration() |
+        globalScopeUnit = globalVariableDeclaration()  |
         globalScopeUnit = structDeclaration()  |
         globalScopeUnit = functionDeclaration()
 
@@ -120,11 +120,11 @@ AbstractGlobalScopeUnit globalScopeUnit() :
 
 
 AbstractGlobalScopeUnit functionDeclaration() :
-{ javaCC.Token t; java.util.List parameterList; Stm s; String returnType; }
+{ Token t; java.util.List parameterList; Stm body; String returnType; }
 {
-	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> s = compoundStatement()
+	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> body = compoundStatement()
 
-    { return new FunctionDeclaration(returnType, t.image, parameterList, s );  }
+    { return new FunctionDeclaration(returnType, t.image, parameterList, body );  }
 }
 
 String returnType() :
@@ -139,19 +139,16 @@ String type() :
 { Token t; }
 {
 	    t = <INT> { return t.image; }
-	|   <DOUBLE>
-	|   <BOOL>
+	|   t = <DOUBLE> { return t.image; }
+	|   t = <BOOL> { return t.image; }
 	|   t = <STRING> { return t.image; }
-	|   <ID>
-
-	{ return t.image; }
-
+	|   t = <ID> { return t.image; }
 }
 
 java.util.List parameterList() :
 { java.util.List<Variable> parameterList; }
 {
-	<VOID> | parameterList = formalList() { return parameterList; }
+	<VOID> { return null; } | parameterList = formalList() { return parameterList; }
 
 }
 
@@ -168,16 +165,16 @@ StructDeclaration structDeclaration() :
 {
 	<STRUCT> <ID> <LBRACE> structMemberDeclarations() <RBRACE> <SEMI>
 
-	{ return null; }
+	{ return new StructDeclaration(); }
 
 }
 
-void structMemberDeclarations() :
+StructMemberDeclaration structMemberDeclarations() :
 {}
 {
 	type() <ID> <SEMI> (type() <ID> <SEMI>)*
 
-		{ return null; }
+		{ return new StructMemberDeclaration(); }
 
 }
 
@@ -186,25 +183,30 @@ GlobalVariableDeclaration globalVariableDeclaration() :
 {
 	(<CONST>)? type = type() t = <ID> <ASSIGN> initializer() <SEMI>
 
-	{ return "a"; }
+	{ return new GlobalVariableDeclaration(); }
 }
 
-void initializer() :
+SimpleInitializer initializer() :
 {}
 {
-	simpleInitializer() | <LBRACE> structInitializer() <RBRACE>
+	simpleInitializer() { return new SimpleInitializer(); }
+	| <LBRACE> structInitializer() <RBRACE> { return new SimpleInitializer(); }
 }
 
-StrConst simpleInitializer() :
+Exp simpleInitializer() :
 { Token t;}
 {
-	<INTCONST> | <DOUBLECONST> | <TRUE> | <FALSE> | t = <STRCONST> { return new StrConst(t.image); }
+	t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }     |
+	t =  <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
+	t = <TRUE> { return new BNum(true); }         |
+	t = <FALSE> { return new BNum(false); }        |
+    t = <STRCONST> { return new StrConst(t.image); }
 }
 
-void structInitializer() :
+StructInitializer structInitializer() :
 {}
 {
-	initializer() (<COMMA> initializer())*
+	initializer() { return new StructInitializer(); } (<COMMA> initializer() { return new StructInitializer(); })*
 }
 
 Stm compoundStatement() :
@@ -421,12 +423,13 @@ Exp multiplicativeExpression() :
 }
 
 Exp exponentialExpression() :
-{ Exp e1,e2; }
+{ Exp e1,e2;}
 {
 	e1 = unaryExpression()
 	(
-	    t= <POWER> e2 = unaryExpression() { return new ExponentialExpression(e1, e2); }
+	    <POWER> e2 = unaryExpression() { return new ExponentialExpression(e1, e2); }
 	)*
+	{ return e1; }
 }
 
 Exp unaryExpression() :
@@ -437,22 +440,22 @@ Exp unaryExpression() :
 }
 
 Exp postfixExpression() :
-{ Exp e1,e2; Token t = null;}
+{ Exp e1; Exp e2 = null; Token t = null;}
 {
 	e1 = primaryExpression()
 	(
-	      <LBRACK> e2 = expression() <RBRACK> { return new PostFixExpression(e1, e2, t.image); }
-	    | <DOT> t = <ID> { return new PostFixExpression(e1, e2, t.image); }
+	      <LBRACK> e2 = expression() <RBRACK> { return new PostfixExpression(e1, e2, t.image); }
+	    | <DOT> t = <ID> { return new PostfixExpression(e1, e2, t.image); }
 	)*
 	{ return e1; }
 }
 
 Exp primaryExpression() :
-{Exp e1,e2; Token t;}
+{Exp e1,e2; Token t = null;}
 {
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
-	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1); }
-	 | t = <ID> e1 = primaryExpressionPrime() { return new PrimaryExpressionPrime(e1, t.image); }
+	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
+	 | t = <ID> e1 = primaryExpressionPrime() { return new PrimaryExpression(e1, t.image); }
 }
 
 Exp primaryExpressionPrime() :
@@ -462,9 +465,9 @@ Exp primaryExpressionPrime() :
 }
 
 Exp expressionList() :
-{ Exp e1, e2; }
+{ Exp e1 = null; Exp e2 = null; }
 {
-	( e1 = expression() (e2 = <COMMA> expression())* { return new ExpList(e1, e2); })?
+	( e1 = expression() (<COMMA> e2 = expression() { return new ExpList(e1, e2); } )* )?
 
 	{ return e1; }
 }
