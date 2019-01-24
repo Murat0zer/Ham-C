@@ -1,7 +1,19 @@
+package interpreter;
 
-interface Visitor {
+import interpreter.ast.expression.*;
+import interpreter.ast.expression.constant.ConstantExpression;
+import interpreter.ast.expression.constant.IntConst;
+import interpreter.ast.expression.constant.StrConst;
+import interpreter.ast.globalscope.*;
+import interpreter.ast.globalscope.struct.StructDeclaration;
+import interpreter.ast.globalscope.struct.StructInitializer;
+import interpreter.ast.globalscope.struct.StructMemberDeclaration;
+import interpreter.ast.statement.Print;
+import interpreter.ast.statement.Statement;
 
-    void visit(Stm s);
+public interface Visitor {
+
+    void visit(Statement s);
 
     void visit(Print s);
 
@@ -43,14 +55,14 @@ interface Visitor {
 
     Object visit(ConstantExpression e);
 
-    Object visit(Exp e);
+    Object visit(Expression e);
 
     Object visit(PostfixExpression e);
 
     Object visit(PrimaryExpressionPrime e);
 
-    Object visit(ExpList e);
+    Object visit(ExpressionList e);
 
-    Object visit(BNum e);
+    Object visit(BoolExpression e);
 
 }

@@ -4,7 +4,14 @@ options {
 
 
 PARSER_BEGIN(Parser)
-
+package javacc;
+import interpreter.*;
+import interpreter.ast.*;
+import interpreter.ast.expression.*;
+import interpreter.ast.expression.constant.*;
+import interpreter.ast.globalscope.*;
+import interpreter.ast.globalscope.struct.*;
+import interpreter.ast.statement.*;
 public class Parser {
 	public static void main(String args[]) throws ParseException {
 
@@ -120,7 +127,7 @@ AbstractGlobalScopeUnit globalScopeUnit() :
 
 
 AbstractGlobalScopeUnit functionDeclaration() :
-{ Token t; java.util.List parameterList; Stm body; String returnType; }
+{ Token t; java.util.List parameterList; Statement body; String returnType; }
 {
 	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> body = compoundStatement()
 
@@ -193,13 +200,13 @@ SimpleInitializer initializer() :
 	| <LBRACE> structInitializer() <RBRACE> { return new SimpleInitializer(); }
 }
 
-Exp simpleInitializer() :
+Expression simpleInitializer() :
 { Token t;}
 {
 	t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }     |
 	t =  <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
-	t = <TRUE> { return new BNum(true); }         |
-	t = <FALSE> { return new BNum(false); }        |
+	t = <TRUE> { return new BoolExpression(true); }         |
+	t = <FALSE> { return new BoolExpression(false); }        |
     t = <STRCONST> { return new StrConst(t.image); }
 }
 
@@ -209,25 +216,25 @@ StructInitializer structInitializer() :
 	initializer() { return new StructInitializer(); } (<COMMA> initializer() { return new StructInitializer(); })*
 }
 
-Stm compoundStatement() :
-{Stm s1,s2;}
+Statement compoundStatement() :
+{Statement s1,s2;}
 {
 	<LBRACE>
 	    s1 = statementList()
-	    ( s2=compoundStatement() { s1 = new StmList(s1, s2); } )?
+	    ( s2=compoundStatement() { s1 = new StatementList(s1, s2); } )?
     <RBRACE>
 
     { return s1; }
 }
 
-Stm statementList() :
-{Stm s1; }
+Statement statementList() :
+{Statement s1; }
 {
 	(LOOKAHEAD(2) s1 = statement() { return s1; })+
 }
 
-Stm statement() :
-{Stm stm;}
+Statement statement() :
+{Statement stm;}
 {
 	LOOKAHEAD(2)
 	variableDeclarationStatement() | expressionOrAssignmentStatement() | selectionStatement() | compoundStatement()
@@ -338,21 +345,21 @@ void continueStatement() :
 	<CONTINUE> <SEMI>
 }
 
-Stm printStatement() :
-{Exp e; Token t;}
+Statement printStatement() :
+{Expression e; Token t;}
 {
     <PRINT> <LPAREN> e=expression() <RPAREN> <SEMI> { return new Print(e); }
 
 }
 
-Exp expression() :
-{ Exp e; }
+Expression expression() :
+{ Expression e; }
 {
 	e = logicalOr() { return e; }
 }
 
-Exp logicalOr() :
-{ Exp e1, e2; }
+Expression logicalOr() :
+{ Expression e1, e2; }
 {
 	e1 = logicalAnd()
 	(
@@ -361,8 +368,8 @@ Exp logicalOr() :
 	{ return e1; }
 }
 
-Exp logicalAnd() :
-{ Exp e1, e2; }
+Expression logicalAnd() :
+{ Expression e1, e2; }
 {
 	e1 = equalityExpression()
 	(
@@ -372,13 +379,13 @@ Exp logicalAnd() :
 	{ return e1; }
 }
 
-Exp equalityExpression() :
+Expression equalityExpression() :
 //{}
 //{
 //	relationalExpression() ((<EQUAL> | <NOTEQUAL>) relationalExpression())*
 //}
 
-{ Exp e1, e2; Token t; }
+{ Expression e1, e2; Token t; }
 {
 	e1 = relationalExpression()
 	(
@@ -389,8 +396,8 @@ Exp equalityExpression() :
 	{ return e1; }
 }
 
-Exp relationalExpression() :
-{ Exp e1,e2; Token t; }
+Expression relationalExpression() :
+{ Expression e1,e2; Token t; }
 {
 	e1 = additiveExpression()
 	(
@@ -400,8 +407,8 @@ Exp relationalExpression() :
 	{ return e1; }
 }
 
-Exp additiveExpression() :
-{ Exp e1,e2; Token t; }
+Expression additiveExpression() :
+{ Expression e1,e2; Token t; }
 {
 	e1 = multiplicativeExpression()
 	(
@@ -411,8 +418,8 @@ Exp additiveExpression() :
 	{ return e1; }
 }
 
-Exp multiplicativeExpression() :
-{ Exp e1,e2; Token t; }
+Expression multiplicativeExpression() :
+{ Expression e1,e2; Token t; }
 {
 	e1 = exponentialExpression()
 	(
@@ -422,8 +429,8 @@ Exp multiplicativeExpression() :
 	{ return e1; }
 }
 
-Exp exponentialExpression() :
-{ Exp e1,e2;}
+Expression exponentialExpression() :
+{ Expression e1,e2;}
 {
 	e1 = unaryExpression()
 	(
@@ -432,15 +439,15 @@ Exp exponentialExpression() :
 	{ return e1; }
 }
 
-Exp unaryExpression() :
-{ Exp e1; String unaryOp = null; }
+Expression unaryExpression() :
+{ Expression e1; String unaryOp = null; }
 {
 	   unaryOp = unaryOperator() e1 = postfixExpression() { return new UnaryExpression(e1, unaryOp); }
 	 | e1 = postfixExpression() { return new UnaryExpression(e1, unaryOp); }
 }
 
-Exp postfixExpression() :
-{ Exp e1; Exp e2 = null; Token t = null;}
+Expression postfixExpression() :
+{ Expression e1; Expression e2 = null; Token t = null;}
 {
 	e1 = primaryExpression()
 	(
@@ -450,35 +457,35 @@ Exp postfixExpression() :
 	{ return e1; }
 }
 
-Exp primaryExpression() :
-{Exp e1,e2; Token t = null;}
+Expression primaryExpression() :
+{Expression e1,e2; Token t = null;}
 {
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
 	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
 	 | t = <ID> e1 = primaryExpressionPrime() { return new PrimaryExpression(e1, t.image); }
 }
 
-Exp primaryExpressionPrime() :
-{ Exp e1;}
+Expression primaryExpressionPrime() :
+{ Expression e1;}
 {
 	(<LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
 }
 
-Exp expressionList() :
-{ Exp e1 = null; Exp e2 = null; }
+Expression expressionList() :
+{ Expression e1 = null; Expression e2 = null; }
 {
-	( e1 = expression() (<COMMA> e2 = expression() { return new ExpList(e1, e2); } )* )?
+	( e1 = expression() (<COMMA> e2 = expression() { return new ExpressionList(e1, e2); } )* )?
 
 	{ return e1; }
 }
 
-Exp constantExpression() :
+Expression constantExpression() :
 {Token t;}
 {
 	  t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }
 	| t = <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); }
-	| t = <TRUE> { return new BNum(true); }
-	| t = <FALSE> { return new BNum(false); }
+	| t = <TRUE> { return new BoolExpression(true); }
+	| t = <FALSE> { return new BoolExpression(false); }
 	| t = <STRCONST> { return new StrConst(t.image); }
 }
 
@@ -486,5 +493,6 @@ String unaryOperator() :
 {Token t;}
 {
 	t = <PLUS> | t=  <MINUS> | t =  <NOT>
+
 	{ return t.image; }
 }
