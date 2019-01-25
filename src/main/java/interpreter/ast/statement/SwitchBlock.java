@@ -8,14 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class StatementList extends Statement {
+@AllArgsConstructor
+public class SwitchBlock extends Statement {
 
-    private Statement statement;
-    private Statement statementList;
+    private Statement labelBlock;
+    private Statement switchBlock;
 
     public Object accept(Visitor v) {
-        return v.visit( this);
+        return v.visit(this);
     }
 }

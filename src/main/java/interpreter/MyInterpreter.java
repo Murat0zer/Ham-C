@@ -13,6 +13,8 @@ public class MyInterpreter {
     public static void main(String[] args) {
         try {
 
+            Runtime.getRuntime().exec("/home/murat/Desktop/Derleyici/javacc-3.2/javacc-5.0/bin/javacc asdasd");
+
             File initialFile = new File("program.hc");
             InputStream targetStream = new FileInputStream(initialFile);
 

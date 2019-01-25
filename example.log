@@ -1,0 +1,38 @@
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - Cannot run program "javacc": error=2, No such file or directory
+ERROR main interpreter.MyInterpreter - Cannot run program "javacc": error=2, No such file or directory
+ERROR main interpreter.MyInterpreter - Cannot run program "javacc": error=2, No such file or directory
+ERROR main interpreter.MyInterpreter - Cannot run program "javacc": error=2, No such file or directory
+ERROR main interpreter.MyInterpreter - java.lang.String cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - java.lang.Integer cannot be cast to interpreter.ast.expression.constant.IntConst
+ERROR main interpreter.MyInterpreter - -1
+ERROR main interpreter.MyInterpreter - -1
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - Encountered " ")" ") "" at line 6, column 16.
+Was expecting one of:
+    "true" ...
+    "false" ...
+    "(" ...
+    "+" ...
+    "-" ...
+    "!" ...
+    <ID> ...
+    <INTCONST> ...
+    <DOUBLECONST> ...
+    <STRCONST> ...
+    

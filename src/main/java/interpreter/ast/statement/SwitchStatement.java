@@ -10,12 +10,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatementList extends Statement {
+public class SwitchStatement extends Statement {
 
-    private Statement statement;
-    private Statement statementList;
+    private Statement switchStatement;
 
     public Object accept(Visitor v) {
-        return v.visit( this);
+        return v.visit(this);
     }
 }

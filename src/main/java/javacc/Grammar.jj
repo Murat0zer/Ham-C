@@ -11,6 +11,7 @@ import interpreter.ast.expression.*;
 import interpreter.ast.expression.constant.*;
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
+import interpreter.ast.statement.iteration.*;
 import interpreter.ast.statement.*;
 public class Parser {
 	public static void main(String args[]) throws ParseException {
@@ -221,32 +222,49 @@ Statement compoundStatement() :
 {
 	<LBRACE>
 	    s1 = statementList()
-	    ( s2=compoundStatement() { s1 = new StatementList(s1, s2); } )?
+	    ( s2=compoundStatement() { s1 = new CompoundStatement(s1, s2); } )?
     <RBRACE>
 
     { return s1; }
 }
 
 Statement statementList() :
-{Statement s1; }
+{Statement statement, statementList; }
 {
-	(LOOKAHEAD(2) s1 = statement() { return s1; })+
+	(
+	    LOOKAHEAD(2)
+        statement = statement()
+        (
+            LOOKAHEAD(2)
+            statementList = statementList()
+            { return new StatementList(statement, statementList); }
+        )*
+    )+
+
+	{ return statement; }
 }
 
 Statement statement() :
 {Statement stm;}
 {
-	LOOKAHEAD(2)
-	variableDeclarationStatement() | expressionOrAssignmentStatement() | selectionStatement() | compoundStatement()
-	| iterationStatement() | returnStatement() | breakStatement() | continueStatement()
+	  LOOKAHEAD(2)
+      stm = variableDeclarationStatement() { return stm; }
+	| stm = expressionOrAssignmentStatement() { return stm; }
+	| stm = selectionStatement() { return stm; }
+	| stm = compoundStatement() { return stm; }
+	| stm = iterationStatement() { return stm; }
+	| stm = returnStatement() { return stm; }
+	| stm = breakStatement() { return stm; }
+	| stm = continueStatement() { return stm; }
 	| stm = printStatement() { return stm; }
-
 }
 
-void expressionOrAssignmentStatement() :
-{}
+Statement expressionOrAssignmentStatement() :
+{ Expression left = null; Expression right = null; }
 {
-	(expression() (<ASSIGN> expression())?)? <SEMI>
+	( left = expression() (<ASSIGN> right = expression())?)? <SEMI>
+
+	{ return new ExpressionOrAssignmentStatement(left, right); }
 }
 
 /*
@@ -269,80 +287,112 @@ void expressionStatement() :
 
 
 
-void variableDeclarationStatement() :
-{}
+Statement variableDeclarationStatement() :
+{ String type = null; Token t; Expression valueExp = null;}
 {
-	(<CONST>)? type() <ID> (<ASSIGN> expression())? <SEMI>
+	(<CONST>)? type = type() t = <ID> (<ASSIGN> valueExp = expression())? <SEMI>
+
+	{ return new VariableDeclarationStatement(type, t.image, valueExp); }
 }
 
 
-void selectionStatement() :
-{}
+Statement selectionStatement() :
+{ Statement statement; }
 {
-	ifStatement() | switchStatement()
+	statement = ifStatement() { return statement; } | statement = switchStatement() { return statement; }
+
+
 }
 
-void ifStatement() :
-{}
+Statement ifStatement() :
+{ Expression boolExpression; Statement trueBlock; Statement elseBlock = null; }
 {
-	<IF> <LPAREN> expression() <RPAREN> statement() (LOOKAHEAD(1) <ELSE> statement())?
+	<IF> <LPAREN> boolExpression = expression() <RPAREN> trueBlock = statement() (LOOKAHEAD(1) <ELSE> elseBlock = statement())?
+
+	{ return new IfStatement(boolExpression, trueBlock, elseBlock); }
 }
 
 
-void switchStatement() :
+Statement switchStatement() :
 {}
 {
 	<SWITCH> <LPAREN> expression() <RPAREN> <LBRACE> switchBlock() <RBRACE>
+
+	{ return new SwitchStatement(); }
 }
 
-void switchBlock() :
-{}
+Statement switchBlock() :
+{ Statement labelBlock, switchBlock; }
 {
-	labelBlock() (labelBlock())*
+	labelBlock = labelBlock() ( switchBlock = labelBlock() { return new SwitchBlock(labelBlock, switchBlock); })*
+
+	{ return labelBlock;}
 }
 
-void labelBlock() :
-{}
+Statement labelBlock() :
+{ Expression constantExpression = null; Statement labelStatement; }
 {
-	<CASE> constExpression() <COLON> labelStatement() | <DEFAULT_> <COLON> labelStatement()
+	<CASE> constantExpression = constantExpression() <COLON> labelStatement = labelStatement()
+
+	| <DEFAULT_> <COLON> labelStatement = labelStatement()
+
+	{ return new LabelBlock(constantExpression, labelStatement); }
 }
 
-void labelStatement() :
-{}
+Statement labelStatement() :
+{ Statement statementList = null; }
 {
-	(statementList())?
+	(statementList = statementList())?
+
+	{ return new LabelStatement(statementList); }
 }
 
-void constExpression() :
-{}
+//void constExpression() :
+//{}
+//{
+//	<INTCONST> | <DOUBLECONST> | <TRUE> | <FALSE> | <STRCONST>
+//}
+
+Statement iterationStatement() :
 {
-	<INTCONST> | <DOUBLECONST> | <TRUE> | <FALSE> | <STRCONST>
+    Token t; Expression boolExpression = null; Statement iterationBody;
+    Expression forIndex = null, forIncrement = null;
 }
-
-void iterationStatement() :
-{}
 {
-	<WHILE> <LPAREN> expression() <RPAREN> statement()
-	| <DO> statement() <WHILE> <LPAREN> expression() <RPAREN> <SEMI>
-	| <FOR> <LPAREN> (expression())? <SEMI> (expression())? <SEMI> (expression())? <RPAREN> statement()
-}
+	  t = <WHILE> <LPAREN> boolExpression = expression() <RPAREN> iterationBody = statement()
+	      { return new WhileStatement(boolExpression, iterationBody); }
 
-void returnStatement() :
-{}
+	| t = <DO> iterationBody = statement() <WHILE> <LPAREN> boolExpression = expression() <RPAREN> <SEMI>
+          { return new interpreter.ast.statement.iteration.DoWhileStatement(boolExpression, iterationBody); }
+
+	| t = <FOR> <LPAREN> (forIndex = expression())?
+	        <SEMI> (boolExpression = expression())?
+	        <SEMI> (forIncrement = expression())? <RPAREN>
+	        iterationBody = statement()
+	        { return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement ); }
+}
+Statement returnStatement() :
+{ Expression expression = null; }
+
 {
-	<RETURN> (expression())? <SEMI>
+	<RETURN> ( expression = expression())? <SEMI>
+
+	{ return new ReturnStatement(expression); }
 }
 
-void breakStatement() :
+Statement breakStatement() :
 {}
 {
 	<BREAK> <SEMI>
+	{ return new BreakStatement(); }
 }
 
-void continueStatement() :
+Statement continueStatement() :
 {}
 {
 	<CONTINUE> <SEMI>
+	{ return new ContinueStatement(); }
+
 }
 
 Statement printStatement() :
@@ -466,9 +516,11 @@ Expression primaryExpression() :
 }
 
 Expression primaryExpressionPrime() :
-{ Expression e1;}
+{ Expression e1 = null; }
 {
+
 	(<LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
+	{ return  e1; }
 }
 
 Expression expressionList() :
@@ -476,7 +528,7 @@ Expression expressionList() :
 {
 	( e1 = expression() (<COMMA> e2 = expression() { return new ExpressionList(e1, e2); } )* )?
 
-	{ return e1; }
+	{ return new ExpressionList(e1, e2); }
 }
 
 Expression constantExpression() :

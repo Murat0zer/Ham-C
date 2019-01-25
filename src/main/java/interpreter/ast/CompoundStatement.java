@@ -1,21 +1,22 @@
-package interpreter.ast.statement;
+package interpreter.ast;
 
 import interpreter.Visitor;
+import interpreter.ast.statement.Statement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatementList extends Statement {
+@Getter
+@Setter
+public class CompoundStatement extends Statement {
 
     private Statement statement;
-    private Statement statementList;
+    private Statement compoundStatement;
 
     public Object accept(Visitor v) {
-        return v.visit( this);
+       return v.visit(this);
     }
 }

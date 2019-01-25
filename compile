@@ -1,5 +1,0 @@
-#!/bin/bash
-
-javacc Grammar.jj
-javac *.java
-java MyInterpreter < example.txt

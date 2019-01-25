@@ -2,6 +2,8 @@
 
 int main(void){
 
-    print("Hello World");
+    int myvar = 12345;
+    print(myvar);
+    print("123");
 
 }

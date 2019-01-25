@@ -6,16 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-public class StatementList extends Statement {
+@AllArgsConstructor
+public class BreakStatement extends Statement {
 
     private Statement statement;
-    private Statement statementList;
 
     public Object accept(Visitor v) {
-        return v.visit( this);
+       return v.visit(this);
     }
 }
