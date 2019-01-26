@@ -430,11 +430,6 @@ Expression logicalAnd() :
 }
 
 Expression equalityExpression() :
-//{}
-//{
-//	relationalExpression() ((<EQUAL> | <NOTEQUAL>) relationalExpression())*
-//}
-
 { Expression e1, e2; Token t; }
 {
 	e1 = relationalExpression()
@@ -512,13 +507,13 @@ Expression primaryExpression() :
 {
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
 	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
-	 | t = <ID> e1 = primaryExpressionPrime() { return new PrimaryExpression(e1, t.image); }
+	 | t = <ID>  { return new IdExpression(t.image); }
+
 }
 
 Expression primaryExpressionPrime() :
 { Expression e1 = null; }
 {
-
 	(<LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
 	{ return  e1; }
 }

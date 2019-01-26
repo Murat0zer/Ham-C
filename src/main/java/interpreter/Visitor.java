@@ -71,6 +71,8 @@ public interface Visitor {
 
     Object visit(BoolExpression e);
 
+    Object visit(IdExpression idExpression);
+
     Object visit(VariableDeclarationStatement statement);
 
     Object visit(ContinueStatement statement);

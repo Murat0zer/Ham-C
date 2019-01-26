@@ -36,3 +36,7 @@ Was expecting one of:
     <DOUBLECONST> ...
     <STRCONST> ...
     
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - interpreter.ast.statement.Print cannot be cast to interpreter.ast.statement.StatementList
+ERROR main interpreter.MyInterpreter - interpreter.ast.statement.Print cannot be cast to interpreter.ast.statement.StatementList

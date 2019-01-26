@@ -27,6 +27,7 @@
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/constant/IntConst.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/PrimaryExpression.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/Table.java
+/home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/IdExpression.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/VariableDeclarationStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/javacc/Token.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/iteration/ForStatement.java

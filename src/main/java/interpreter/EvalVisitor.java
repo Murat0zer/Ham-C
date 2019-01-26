@@ -32,7 +32,10 @@ class EvalVisitor implements Visitor {
     }
 
     public void visit(FunctionDeclaration functionDeclaration) {
+
+        table.beginScope();
         functionDeclaration.getStatementList().accept(this);
+        table.endScope();
 
     }
 
@@ -52,10 +55,10 @@ class EvalVisitor implements Visitor {
 
     public Object visit(StatementList s) {
 
-        StatementList statementList = null;
+        Statement statementList = null;
         Statement statement = (Statement) s.getStatement().accept(this);
         if (Objects.nonNull(s.getStatementList()))
-            statementList = (StatementList) s.getStatementList().accept(this);
+            statementList = (Statement) s.getStatementList().accept(this);
         return new StatementList(statement, statementList);
     }
 
@@ -182,9 +185,8 @@ class EvalVisitor implements Visitor {
 
     public Object visit(VariableDeclarationStatement statement) {
 
-        table.beginScope();
+
         this.table.add(statement.getId(), (Integer) statement.getValueExp().accept(this));
-        table.endScope();
         return statement;
 
     }
@@ -257,5 +259,10 @@ class EvalVisitor implements Visitor {
     @Override
     public Object visit(ForStatement statement) {
         return null;
+    }
+
+    @Override
+    public Object visit(IdExpression idExpression) {
+        return table.get(idExpression.getId());
     }
 }
