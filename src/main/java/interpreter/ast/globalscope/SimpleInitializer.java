@@ -1,13 +1,21 @@
 package interpreter.ast.globalscope;
 
 import interpreter.Visitor;
+import interpreter.ast.expression.Expression;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class SimpleInitializer extends AbstractGlobalScopeUnit {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class SimpleInitializer extends Expression {
 
-    public SimpleInitializer() {
-    }
+    private Expression expression;
 
-    public void accept(Visitor v) {
-        v.visit(this);
+    public Object accept(Visitor v) {
+        return v.visit(this);
     }
 }

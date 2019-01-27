@@ -28,7 +28,9 @@ class EvalVisitor implements Visitor {
     Table table = new Table(1000);
 
     public void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit) {
+        table.beginScope();
         abstractGlobalScopeUnit.accept(this);
+
     }
 
     public void visit(FunctionDeclaration functionDeclaration) {
@@ -43,6 +45,10 @@ class EvalVisitor implements Visitor {
     }
 
     public void visit(GlobalVariableDeclaration globalVariableDeclaration) {
+        table.beginScope();
+        Object expression = globalVariableDeclaration.getValue().accept(this);
+        table.add(globalVariableDeclaration.getId(), expression );
+
     }
 
     public Object visit(IntConst exp) {
@@ -173,8 +179,8 @@ class EvalVisitor implements Visitor {
     }
 
 
-    public void visit(SimpleInitializer simpleInitializer) {
-
+    public Object visit(SimpleInitializer simpleInitializer) {
+        return simpleInitializer.getExpression().accept(this);
     }
 
 
@@ -185,8 +191,7 @@ class EvalVisitor implements Visitor {
 
     public Object visit(VariableDeclarationStatement statement) {
 
-
-        this.table.add(statement.getId(), (Integer) statement.getValueExp().accept(this));
+        this.table.add(statement.getId(), statement.getValueExp().accept(this));
         return statement;
 
     }
@@ -263,6 +268,16 @@ class EvalVisitor implements Visitor {
 
     @Override
     public Object visit(IdExpression idExpression) {
-        return table.get(idExpression.getId());
+        Object value = null;
+        int fpTemp = table.fp;
+        while(Objects.isNull(value)) {
+            value = table.get(idExpression.getId());
+            table.fp--;
+            if(table.fp == -1) {
+                table.fp = fpTemp;
+                break;
+            }
+        }
+        return value;
     }
 }

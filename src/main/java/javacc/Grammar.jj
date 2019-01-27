@@ -103,29 +103,30 @@ TOKEN : {
 
 }
 
-AbstractGlobalScopeUnit start() :
-{ AbstractGlobalScopeUnit abstractGlobalScopeUnit; }
+java.util.List start() :
+{
+    AbstractGlobalScopeUnit abstractGlobalScopeUnit = null;
+    java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
+    }
 {
   (
      abstractGlobalScopeUnit =  globalScopeUnit()
+     { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); }
 
   )+
-   <EOF> { return abstractGlobalScopeUnit; }
+   <EOF>
+   { return abstractGlobalScopeUnits; }
 }
 
 AbstractGlobalScopeUnit globalScopeUnit() :
 { AbstractGlobalScopeUnit globalScopeUnit; }
 {
-
         LOOKAHEAD(3)
-        globalScopeUnit = globalVariableDeclaration()  |
-        globalScopeUnit = structDeclaration()  |
-        globalScopeUnit = functionDeclaration()
+        globalScopeUnit = globalVariableDeclaration() { return globalScopeUnit; }  |
+        globalScopeUnit = functionDeclaration() { return globalScopeUnit; } |
+        globalScopeUnit = structDeclaration()  { return globalScopeUnit; }
 
-
-	{ return globalScopeUnit; }
 }
-
 
 AbstractGlobalScopeUnit functionDeclaration() :
 { Token t; java.util.List parameterList; Statement body; String returnType; }
@@ -186,18 +187,18 @@ StructMemberDeclaration structMemberDeclarations() :
 
 }
 
-GlobalVariableDeclaration globalVariableDeclaration() :
-{ String type; Token t; String id; String value; GlobalVariableDeclaration globalVariableDeclaration; }
+AbstractGlobalScopeUnit globalVariableDeclaration() :
+{ String type; Token id, constToken = null; Expression value; }
 {
-	(<CONST>)? type = type() t = <ID> <ASSIGN> initializer() <SEMI>
+	(constToken = <CONST>)? type = type() id = <ID> <ASSIGN> value = initializer() <SEMI>
 
-	{ return new GlobalVariableDeclaration(); }
+	{ return new GlobalVariableDeclaration(type, id.image, value, constToken); }
 }
 
-SimpleInitializer initializer() :
-{}
+Expression initializer() :
+{ Expression expression; }
 {
-	simpleInitializer() { return new SimpleInitializer(); }
+	expression = simpleInitializer() { return new SimpleInitializer(expression); }
 	| <LBRACE> structInitializer() <RBRACE> { return new SimpleInitializer(); }
 }
 
@@ -205,9 +206,9 @@ Expression simpleInitializer() :
 { Token t;}
 {
 	t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }     |
-	t =  <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
-	t = <TRUE> { return new BoolExpression(true); }         |
-	t = <FALSE> { return new BoolExpression(false); }        |
+	t = <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
+	    <TRUE> { return new BoolExpression(true); } |
+	    <FALSE> { return new BoolExpression(false); }|
     t = <STRCONST> { return new StrConst(t.image); }
 }
 

@@ -20,11 +20,11 @@ public class Table {
         table[fp--] = null;
     }
 
-    public void add(String id, Integer val) {
+    public void add(String id, Object val) {
         table[fp].put(id, val);
     }
 
-    public Integer get(String id) {
-        return (Integer) (table[fp].get(id));
+    public Object get(String id) {
+        return (table[fp].get(id));
     }
 }

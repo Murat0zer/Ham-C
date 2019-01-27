@@ -22,13 +22,15 @@ public class Parser implements ParserConstants {
                 }
         }
 
-  static final public AbstractGlobalScopeUnit start() throws ParseException {
+  static final public java.util.List start() throws ParseException {
     trace_call("start");
     try {
-  AbstractGlobalScopeUnit abstractGlobalScopeUnit;
+    AbstractGlobalScopeUnit abstractGlobalScopeUnit = null;
+    java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
       label_1:
       while (true) {
         abstractGlobalScopeUnit = globalScopeUnit();
+       abstractGlobalScopeUnits.add(abstractGlobalScopeUnit);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRUCT:
         case CONST:
@@ -46,7 +48,7 @@ public class Parser implements ParserConstants {
         }
       }
       jj_consume_token(0);
-           {if (true) return abstractGlobalScopeUnit;}
+     {if (true) return abstractGlobalScopeUnits;}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("start");
@@ -59,11 +61,9 @@ public class Parser implements ParserConstants {
   AbstractGlobalScopeUnit globalScopeUnit;
       if (jj_2_1(3)) {
         globalScopeUnit = globalVariableDeclaration();
+                                                        {if (true) return globalScopeUnit;}
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case STRUCT:
-          globalScopeUnit = structDeclaration();
-          break;
         case VOID:
         case INT:
         case BOOL:
@@ -71,7 +71,11 @@ public class Parser implements ParserConstants {
         case STRING:
         case ID:
           globalScopeUnit = functionDeclaration();
-          {if (true) return globalScopeUnit;}
+                                                  {if (true) return globalScopeUnit;}
+          break;
+        case STRUCT:
+          globalScopeUnit = structDeclaration();
+                                                 {if (true) return globalScopeUnit;}
           break;
         default:
           jj_la1[1] = jj_gen;
@@ -267,41 +271,42 @@ public class Parser implements ParserConstants {
     }
   }
 
-  static final public GlobalVariableDeclaration globalVariableDeclaration() throws ParseException {
+  static final public AbstractGlobalScopeUnit globalVariableDeclaration() throws ParseException {
     trace_call("globalVariableDeclaration");
     try {
-  String type; Token t; String id; String value; GlobalVariableDeclaration globalVariableDeclaration;
+  String type; Token id, constToken = null; Expression value;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case CONST:
-        jj_consume_token(CONST);
+        constToken = jj_consume_token(CONST);
         break;
       default:
         jj_la1[8] = jj_gen;
         ;
       }
       type = type();
-      t = jj_consume_token(ID);
+      id = jj_consume_token(ID);
       jj_consume_token(ASSIGN);
-      initializer();
+      value = initializer();
       jj_consume_token(SEMI);
-          {if (true) return new GlobalVariableDeclaration();}
+          {if (true) return new GlobalVariableDeclaration(type, id.image, value, constToken);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("globalVariableDeclaration");
     }
   }
 
-  static final public SimpleInitializer initializer() throws ParseException {
+  static final public Expression initializer() throws ParseException {
     trace_call("initializer");
     try {
+  Expression expression;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TRUE:
       case FALSE:
       case INTCONST:
       case DOUBLECONST:
       case STRCONST:
-        simpleInitializer();
-                              {if (true) return new SimpleInitializer();}
+        expression = simpleInitializer();
+                                           {if (true) return new SimpleInitializer(expression);}
         break;
       case LBRACE:
         jj_consume_token(LBRACE);
@@ -331,14 +336,14 @@ public class Parser implements ParserConstants {
         break;
       case DOUBLECONST:
         t = jj_consume_token(DOUBLECONST);
-                             {if (true) return new DoubleConst(Double.parseDouble(t.image));}
+                            {if (true) return new DoubleConst(Double.parseDouble(t.image));}
         break;
       case TRUE:
-        t = jj_consume_token(TRUE);
+        jj_consume_token(TRUE);
                      {if (true) return new BoolExpression(true);}
         break;
       case FALSE:
-        t = jj_consume_token(FALSE);
+        jj_consume_token(FALSE);
                       {if (true) return new BoolExpression(false);}
         break;
       case STRCONST:
@@ -1609,6 +1614,11 @@ void expressionStatement() :
     return false;
   }
 
+  static private boolean jj_3_1() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_75() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1621,11 +1631,6 @@ void expressionStatement() :
 
   static private boolean jj_3R_79() {
     if (jj_scan_token(LBRACK)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_17()) return true;
     return false;
   }
 

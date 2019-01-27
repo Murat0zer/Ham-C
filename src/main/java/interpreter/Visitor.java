@@ -39,7 +39,7 @@ public interface Visitor {
 
     void visit (StructInitializer structInitializer);
 
-    void visit (SimpleInitializer simpleInitializer);
+    Object visit (SimpleInitializer simpleInitializer);
 
     Object visit(LogicalOR e);
 
