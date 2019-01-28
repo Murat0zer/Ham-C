@@ -20,7 +20,9 @@ public class MyInterpreter {
             EvalVisitor evalVisitor = new EvalVisitor();
              List<AbstractGlobalScopeUnit> abstractGlobalScopeUnits =   new Parser(targetStream).start();
 
-             abstractGlobalScopeUnits.forEach(evalVisitor::visit);
+            for (AbstractGlobalScopeUnit abstractGlobalScopeUnit : abstractGlobalScopeUnits) {
+                evalVisitor.visit(abstractGlobalScopeUnit);
+            }
 
         } catch (Exception exception) {
             log.error(exception.getMessage());

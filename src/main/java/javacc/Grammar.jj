@@ -107,7 +107,7 @@ java.util.List start() :
 {
     AbstractGlobalScopeUnit abstractGlobalScopeUnit = null;
     java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
-    }
+}
 {
   (
      abstractGlobalScopeUnit =  globalScopeUnit()
@@ -414,8 +414,9 @@ Expression logicalOr() :
 {
 	e1 = logicalAnd()
 	(
-	    <OR>  e2 = logicalAnd() { return new LogicalOR(e1, e2); }
-	)*
+		LOOKAHEAD(2)
+	    <OR>  e2 = expression() { return new LogicalOR(e1, e2); }
+	)?
 	{ return e1; }
 }
 
@@ -424,8 +425,9 @@ Expression logicalAnd() :
 {
 	e1 = equalityExpression()
 	(
-	    <AND> e2 = equalityExpression() { return new LogicalAND(e1, e2); }
-	)*
+		LOOKAHEAD(2)
+	    <AND> e2 = expression() { return new LogicalAND(e1, e2); }
+	)?
 
 	{ return e1; }
 }
@@ -435,9 +437,11 @@ Expression equalityExpression() :
 {
 	e1 = relationalExpression()
 	(
+	    	    LOOKAHEAD(2)
+
 	    (t = <EQUAL> | t = <NOTEQUAL>)
-	    e2 = relationalExpression() { return new EqualityExpression(e1, e2, t.image); }
-	)*
+	    e2 = expression() { return new EqualityExpression(e1, e2, t.image); }
+	)?
 
 	{ return e1; }
 }
@@ -447,9 +451,10 @@ Expression relationalExpression() :
 {
 	e1 = additiveExpression()
 	(
+	    LOOKAHEAD(2)
 	    (t = <LESSTHAN> |t = <LESSEQUAL> |t = <GREATERTHAN> |t = <GREATEREQUAL>)
-	    e2 = additiveExpression() { return new RelationalExpression(e1, e2, t.image); }
-	)*
+	    e2 = expression() { return new RelationalExpression(e1, e2, t.image); }
+	)?
 	{ return e1; }
 }
 
@@ -458,9 +463,10 @@ Expression additiveExpression() :
 {
 	e1 = multiplicativeExpression()
 	(
+		LOOKAHEAD(2)
 	    ( t = <PLUS> | t =  <MINUS>)
-	    e2 = multiplicativeExpression()  { return new AdditiveExpression(e1, e2, t.image); }
-	)*
+	    e2 = expression()  { return new AdditiveExpression(e1, e2, t.image); }
+	)?
 	{ return e1; }
 }
 

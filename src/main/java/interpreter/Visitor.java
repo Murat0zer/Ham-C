@@ -4,6 +4,7 @@ import interpreter.ast.CompoundStatement;
 import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
 import interpreter.ast.expression.constant.ConstantExpression;
+import interpreter.ast.expression.constant.DoubleConst;
 import interpreter.ast.expression.constant.IntConst;
 import interpreter.ast.expression.constant.StrConst;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
@@ -26,6 +27,8 @@ public interface Visitor {
     Object visit(IntConst exp);
 
     Object visit(StrConst exp);
+
+    Object visit(DoubleConst exp);
 
     void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit);
 

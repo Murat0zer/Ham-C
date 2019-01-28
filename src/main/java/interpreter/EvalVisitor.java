@@ -4,6 +4,7 @@ import interpreter.ast.CompoundStatement;
 import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
 import interpreter.ast.expression.constant.ConstantExpression;
+import interpreter.ast.expression.constant.DoubleConst;
 import interpreter.ast.expression.constant.IntConst;
 import interpreter.ast.expression.constant.StrConst;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
@@ -28,7 +29,6 @@ class EvalVisitor implements Visitor {
     Table table = new Table(1000);
 
     public void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit) {
-        table.beginScope();
         abstractGlobalScopeUnit.accept(this);
 
     }
@@ -45,9 +45,11 @@ class EvalVisitor implements Visitor {
     }
 
     public void visit(GlobalVariableDeclaration globalVariableDeclaration) {
-        table.beginScope();
+        if (table.fp == -1)
+            table.beginScope();
         Object expression = globalVariableDeclaration.getValue().accept(this);
-        table.add(globalVariableDeclaration.getId(), expression );
+        table.add(globalVariableDeclaration.getId(), expression);
+
 
     }
 
@@ -57,6 +59,10 @@ class EvalVisitor implements Visitor {
 
     public Object visit(StrConst exp) {
         return exp.getValue();
+    }
+
+    public Object visit(DoubleConst exp) {
+        return exp.getDoubleConst();
     }
 
     public Object visit(StatementList s) {
@@ -113,20 +119,41 @@ class EvalVisitor implements Visitor {
     public Expression visit(RelationalExpression e) {
         Expression left = (Expression) e.getLeft().accept(this);
         Expression right = (Expression) e.getRight().accept(this);
-        return left;
+
+        return new RelationalExpression(left, right, e.getOperatorType());
     }
 
 
-    public Expression visit(AdditiveExpression e) {
-        Expression left = (Expression) e.getLeft().accept(this);
-        Expression right = (Expression) e.getRight().accept(this);
-        return left;
+    public Object visit(AdditiveExpression e) {
+        Object left = e.getLeft().accept(this);
+        Object right = e.getRight().accept(this);
+
+        String leftType = left.getClass().getSimpleName();
+        String rightType = right.getClass().getSimpleName();
+
+        if (e.getOperatorType().equals("+")) {
+            if (leftType.equals("String") || rightType.equals("String"))
+                return new StrConst((String) left + right).getValue();
+            else if (leftType.equals("Integer") || rightType.equals("Integer"))
+                return new IntConst((Integer) left + (Integer) right).getConstInt();
+            else
+                return new DoubleConst((Double) left + (Double) right).getDoubleConst();
+        } else {
+
+            if (leftType.equals("Integer") || rightType.equals("Integer"))
+                return new IntConst((Integer) left - (Integer) right).getConstInt();
+            else
+                return new DoubleConst((Double) left - (Double) right).getDoubleConst();
+        }
+
     }
 
     public Expression visit(MultiplicativeExpression e) {
         Expression left = (Expression) e.getLeft().accept(this);
         Expression right = (Expression) e.getRight().accept(this);
-        return left;
+
+        return new MultiplicativeExpression(left, right, e.getOperatorType());
+
     }
 
 
@@ -270,14 +297,14 @@ class EvalVisitor implements Visitor {
     public Object visit(IdExpression idExpression) {
         Object value = null;
         int fpTemp = table.fp;
-        while(Objects.isNull(value)) {
+        while (Objects.isNull(value)) {
             value = table.get(idExpression.getId());
             table.fp--;
-            if(table.fp == -1) {
-                table.fp = fpTemp;
+            if (table.fp == -1) {
                 break;
             }
         }
+        table.fp = fpTemp;
         return value;
     }
 }

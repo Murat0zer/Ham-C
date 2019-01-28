@@ -1,8 +1,9 @@
 
-const string myvar = "Hello World";
+
 
 int main(void){
 
-    print(myvar);
+    int myLocalInt = 3 + 3 + 15 - 4;
+    print(myLocalInt);
 
 }
