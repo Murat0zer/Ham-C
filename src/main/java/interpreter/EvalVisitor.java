@@ -3,10 +3,21 @@ package interpreter;
 import interpreter.ast.CompoundStatement;
 import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
+import interpreter.ast.expression.additive.AdditiveExpression;
+import interpreter.ast.expression.additive.MinusExpression;
+import interpreter.ast.expression.additive.PlusExpression;
 import interpreter.ast.expression.constant.ConstantExpression;
 import interpreter.ast.expression.constant.DoubleConst;
 import interpreter.ast.expression.constant.IntConst;
 import interpreter.ast.expression.constant.StrConst;
+import interpreter.ast.expression.equality.EqualExpression;
+import interpreter.ast.expression.equality.NotEqualExpression;
+import interpreter.ast.expression.multiplicative.DivideExpression;
+import interpreter.ast.expression.multiplicative.TimesExpression;
+import interpreter.ast.expression.relational.GreaterEqualExpression;
+import interpreter.ast.expression.relational.GreaterThanExpression;
+import interpreter.ast.expression.relational.LessEqualExpression;
+import interpreter.ast.expression.relational.LessThanExpression;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.FunctionDeclaration;
 import interpreter.ast.globalscope.GlobalVariableDeclaration;
@@ -99,22 +110,26 @@ class EvalVisitor implements Visitor {
         return new BoolExpression(((BoolExpression) left).isBoolValue() && ((BoolExpression) right).isBoolValue());
     }
 
-
-    public Expression visit(EqualityExpression e) {
-
+    @Override
+    public Object visit(EqualExpression e) {
         Expression left = (Expression) e.getLeft().accept(this);
         Expression right = (Expression) e.getRight().accept(this);
         BoolExpression result = new BoolExpression(false);
 
-        if ("==".equals(e.getOperatorType())) {
-            result.setBoolValue(((BoolExpression) left).isBoolValue() == ((BoolExpression) right).isBoolValue());
-        } else if ("!=".equals(e.getOperatorType())) {
-            result.setBoolValue(((BoolExpression) left).isBoolValue() != ((BoolExpression) right).isBoolValue());
-        }
+        result.setBoolValue(((BoolExpression) left).isBoolValue() == ((BoolExpression) right).isBoolValue());
 
         return result;
     }
 
+    @Override
+    public Object visit(NotEqualExpression expression) {
+
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        return ( left != right);
+
+    }
 
     public Expression visit(RelationalExpression e) {
         Expression left = (Expression) e.getLeft().accept(this);
@@ -123,39 +138,129 @@ class EvalVisitor implements Visitor {
         return new RelationalExpression(left, right, e.getOperatorType());
     }
 
+    @Override
+    public Object visit(LessThanExpression expression) {
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        if(left instanceof Integer) {
+         int l =   (Integer) left;
+
+         if (right instanceof Integer) {
+             int r = (Integer) right;
+             return  l < r;
+         }
+          else {
+              double r = (Double) right;
+              return l < r;
+         }
+
+        } else {
+            double l =   (Double) left;
+            if (right instanceof Integer) {
+                int r = (Integer) right;
+                return  l < r;
+            } else {
+                double r = (Double) right;
+                return l < r;
+            }
+        }
+
+    }
+
+    @Override
+    public Object visit(LessEqualExpression expression) {
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        return (Double) left <= (Double) right;
+
+    }
+
+    @Override
+    public Object visit(GreaterThanExpression expression) {
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        return (Double) left > (Double) right;
+
+    }
+
+    @Override
+    public Object visit(GreaterEqualExpression expression) {
+
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        return (Double) left >= (Double) right;
+
+    }
 
     public Object visit(AdditiveExpression e) {
         Object left = e.getLeft().accept(this);
         Object right = e.getRight().accept(this);
 
-        String leftType = left.getClass().getSimpleName();
-        String rightType = right.getClass().getSimpleName();
+        e.setLeftType(left.getClass().getSimpleName());
+        e.setRightType(right.getClass().getSimpleName());
 
-        if (e.getOperatorType().equals("+")) {
-            if (leftType.equals("String") || rightType.equals("String"))
-                return new StrConst((String) left + right).getValue();
-            else if (leftType.equals("Integer") || rightType.equals("Integer"))
-                return new IntConst((Integer) left + (Integer) right).getConstInt();
-            else
-                return new DoubleConst((Double) left + (Double) right).getDoubleConst();
-        } else {
+        return null;
+    }
 
-            if (leftType.equals("Integer") || rightType.equals("Integer"))
-                return new IntConst((Integer) left - (Integer) right).getConstInt();
-            else
-                return new DoubleConst((Double) left - (Double) right).getDoubleConst();
+    @Override
+    public Object visit(PlusExpression expression) {
+
+        expression.superAccept(this);
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        if (expression.getLeftType().equals("String") || expression.getRightType().equals("String")) {
+            String l = ((String) left).replace("\"", "");
+            String r = ((String) right).replace("\"", "");
+            return new StrConst(l + r).getValue();
         }
+        else if (expression.getLeftType().equals("Integer") || expression.getRightType().equals("Integer"))
+            return new IntConst((Integer) left + (Integer) right).getConstInt();
+        else
+            return new DoubleConst((Double) left + (Double) right).getDoubleConst();
 
     }
 
-    public Expression visit(MultiplicativeExpression e) {
-        Expression left = (Expression) e.getLeft().accept(this);
-        Expression right = (Expression) e.getRight().accept(this);
+    @Override
+    public Object visit(MinusExpression expression) {
 
-        return new MultiplicativeExpression(left, right, e.getOperatorType());
+        expression.superAccept(this);
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
 
+        if (expression.getLeftType().equals("Integer") || expression.getRightType().equals("Integer"))
+            return new IntConst((Integer) left - (Integer) right).getConstInt();
+        else
+            return new DoubleConst((Double) left - (Double) right).getDoubleConst();
     }
 
+    @Override
+    public Object visit(TimesExpression expression) {
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        if (left instanceof Integer || right instanceof Integer)
+            return new IntConst((Integer) left * (Integer) right).getConstInt();
+        else {
+            return new DoubleConst((Double) left * (Double) right).getDoubleConst();
+        }
+    }
+
+    @Override
+    public Object visit(DivideExpression expression) {
+        Object left = expression.getLeft().accept(this);
+        Object right = expression.getRight().accept(this);
+
+        if (left instanceof Integer || right instanceof Integer)
+            return new IntConst((Integer) left / (Integer) right).getConstInt();
+        else {
+            return new DoubleConst((Double) left / (Double) right).getDoubleConst();
+        }
+    }
 
     public Expression visit(ExponentialExpression e) {
         Expression value = (Expression) e.getValue().accept(this);
@@ -307,4 +412,5 @@ class EvalVisitor implements Visitor {
         table.fp = fpTemp;
         return value;
     }
+
 }

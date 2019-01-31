@@ -3,10 +3,21 @@ package interpreter;
 import interpreter.ast.CompoundStatement;
 import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
+import interpreter.ast.expression.additive.AdditiveExpression;
+import interpreter.ast.expression.additive.MinusExpression;
+import interpreter.ast.expression.additive.PlusExpression;
 import interpreter.ast.expression.constant.ConstantExpression;
 import interpreter.ast.expression.constant.DoubleConst;
 import interpreter.ast.expression.constant.IntConst;
 import interpreter.ast.expression.constant.StrConst;
+import interpreter.ast.expression.equality.EqualExpression;
+import interpreter.ast.expression.equality.NotEqualExpression;
+import interpreter.ast.expression.multiplicative.DivideExpression;
+import interpreter.ast.expression.multiplicative.TimesExpression;
+import interpreter.ast.expression.relational.GreaterEqualExpression;
+import interpreter.ast.expression.relational.GreaterThanExpression;
+import interpreter.ast.expression.relational.LessEqualExpression;
+import interpreter.ast.expression.relational.LessThanExpression;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.FunctionDeclaration;
 import interpreter.ast.globalscope.GlobalVariableDeclaration;
@@ -48,13 +59,27 @@ public interface Visitor {
 
     Object visit(LogicalAND e);
 
-    Object visit(EqualityExpression e);
+    Object visit(EqualExpression e);
 
-    Object visit(RelationalExpression e);
+    Object visit(NotEqualExpression expression);
+
+    Object visit(LessThanExpression expression);
+
+    Object visit(LessEqualExpression expression);
+
+    Object visit(GreaterThanExpression expression);
+
+    Object visit(GreaterEqualExpression expression);
 
     Object visit(AdditiveExpression e);
 
-    Object visit(MultiplicativeExpression e);
+    Object visit(PlusExpression expression);
+
+    Object visit(MinusExpression expression);
+
+    Object visit(TimesExpression expression);
+
+    Object visit(DivideExpression expression);
 
     Object visit(ExponentialExpression e);
 

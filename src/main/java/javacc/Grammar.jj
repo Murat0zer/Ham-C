@@ -9,6 +9,10 @@ import interpreter.*;
 import interpreter.ast.*;
 import interpreter.ast.expression.*;
 import interpreter.ast.expression.constant.*;
+import interpreter.ast.expression.additive.*;
+import interpreter.ast.expression.equality.*;
+import interpreter.ast.expression.multiplicative.*;
+import interpreter.ast.expression.relational.*;
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
@@ -105,7 +109,7 @@ TOKEN : {
 
 java.util.List start() :
 {
-    AbstractGlobalScopeUnit abstractGlobalScopeUnit = null;
+    AbstractGlobalScopeUnit abstractGlobalScopeUnit;
     java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
 }
 {
@@ -414,9 +418,8 @@ Expression logicalOr() :
 {
 	e1 = logicalAnd()
 	(
-		LOOKAHEAD(2)
-	    <OR>  e2 = expression() { return new LogicalOR(e1, e2); }
-	)?
+	    <OR>  e2 = logicalAnd() { e1 = new LogicalOR(e1, e2); }
+	)*
 	{ return e1; }
 }
 
@@ -425,23 +428,22 @@ Expression logicalAnd() :
 {
 	e1 = equalityExpression()
 	(
-		LOOKAHEAD(2)
-	    <AND> e2 = expression() { return new LogicalAND(e1, e2); }
-	)?
+	    <AND> e2 = equalityExpression() { e1 = new LogicalAND(e1, e2); }
+	)*
 
 	{ return e1; }
 }
 
 Expression equalityExpression() :
-{ Expression e1, e2; Token t; }
+{ Expression e1, e2; }
 {
 	e1 = relationalExpression()
 	(
-	    	    LOOKAHEAD(2)
-
-	    (t = <EQUAL> | t = <NOTEQUAL>)
-	    e2 = expression() { return new EqualityExpression(e1, e2, t.image); }
-	)?
+	    (
+            <EQUAL> e2 = relationalExpression() { e1 = new EqualExpression(e1, e2); } |
+	        <NOTEQUAL> e2 = relationalExpression() { e1 = new NotEqualExpression(e1, e2); }
+	    )
+	)*
 
 	{ return e1; }
 }
@@ -451,10 +453,13 @@ Expression relationalExpression() :
 {
 	e1 = additiveExpression()
 	(
-	    LOOKAHEAD(2)
-	    (t = <LESSTHAN> |t = <LESSEQUAL> |t = <GREATERTHAN> |t = <GREATEREQUAL>)
-	    e2 = expression() { return new RelationalExpression(e1, e2, t.image); }
-	)?
+	    (
+            <LESSTHAN> e2 = additiveExpression() { e1 = new LessThanExpression(e1, e2); }           |
+            <LESSEQUAL> e2 = additiveExpression() { e1 = new LessEqualExpression(e1, e2); }         |
+            <GREATERTHAN> e2 = additiveExpression() { e1 = new GreaterThanExpression(e1, e2); }     |
+            <GREATEREQUAL> e2 = additiveExpression() { e1 = new GreaterEqualExpression(e1, e2); }
+        )
+	)*
 	{ return e1; }
 }
 
@@ -463,10 +468,12 @@ Expression additiveExpression() :
 {
 	e1 = multiplicativeExpression()
 	(
-		LOOKAHEAD(2)
-	    ( t = <PLUS> | t =  <MINUS>)
-	    e2 = expression()  { return new AdditiveExpression(e1, e2, t.image); }
-	)?
+
+	    (
+	        <PLUS> e2 = multiplicativeExpression() { e1 = new PlusExpression(e1, e2); } |
+	        <MINUS> e2 = multiplicativeExpression() { e1 = new MinusExpression(e1, e2); }
+	    )
+	)*
 	{ return e1; }
 }
 
@@ -475,8 +482,10 @@ Expression multiplicativeExpression() :
 {
 	e1 = exponentialExpression()
 	(
-	    ( t = <TIMES> | t =  <DIVIDE>)
-	    e2 = exponentialExpression()  { return new MultiplicativeExpression(e1, e2, t.image); }
+	    (
+            <TIMES> e2 = exponentialExpression()  { e1 = new TimesExpression(e1, e2); } |
+            <DIVIDE> e2 = exponentialExpression()  { e1 = new DivideExpression(e1, e2); }
+	    )
 	)*
 	{ return e1; }
 }
@@ -503,7 +512,7 @@ Expression postfixExpression() :
 {
 	e1 = primaryExpression()
 	(
-	      <LBRACK> e2 = expression() <RBRACK> { return new PostfixExpression(e1, e2, t.image); }
+	      <LBRACK> e2 = primaryExpression() <RBRACK> { return new PostfixExpression(e1, e2, t.image); }
 	    | <DOT> t = <ID> { return new PostfixExpression(e1, e2, t.image); }
 	)*
 	{ return e1; }
