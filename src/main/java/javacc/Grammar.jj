@@ -378,10 +378,12 @@ Statement iterationStatement() :
 	  { return new DoWhileStatement(boolExpression, iterationBody); }
 
 	| <FOR> <LPAREN>
-                (LOOKAHEAD(2) forIndex = statement())? <SEMI>
-                (boolExpression = expression())? <SEMI>
-                (forIncrement = assignmentStatement())? <RPAREN>
+                (LOOKAHEAD(2) ( LOOKAHEAD(2) forIndex = statement())? | <SEMI> )
+                boolExpression = expression()  <SEMI>
+                (LOOKAHEAD(2) (forIncrement = statement())?)
+            <RPAREN>
                 iterationBody = statement()
+
       { return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement ); }
 }
 Statement returnStatement() :

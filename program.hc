@@ -23,12 +23,12 @@ int main(void){
         print(myLocalInt);
     }
 
-    int i = 0;
-    i = 5;
+    int i = 5;
+
     print(i);
-    for( i = 0;; i < 5;  ) {
+    for(int i = 0; i <= 5;  i = i + 1;) {
 
         print(i);
-        i = i + 1;
+
     }
 }
