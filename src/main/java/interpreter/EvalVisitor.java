@@ -31,7 +31,7 @@ import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
 
-import java.util.Objects;
+import java.util.*;
 
 class EvalVisitor implements Visitor {
 
@@ -112,13 +112,11 @@ class EvalVisitor implements Visitor {
 
     @Override
     public Object visit(EqualExpression e) {
-        Expression left = (Expression) e.getLeft().accept(this);
-        Expression right = (Expression) e.getRight().accept(this);
-        BoolExpression result = new BoolExpression(false);
+        Object left =  e.getLeft().accept(this);
+        Object right =  e.getRight().accept(this);
 
-        result.setBoolValue(((BoolExpression) left).isBoolValue() == ((BoolExpression) right).isBoolValue());
+        return left.equals(right);
 
-        return result;
     }
 
     @Override
@@ -143,28 +141,7 @@ class EvalVisitor implements Visitor {
         Object left = expression.getLeft().accept(this);
         Object right = expression.getRight().accept(this);
 
-        if(left instanceof Integer) {
-         int l =   (Integer) left;
-
-         if (right instanceof Integer) {
-             int r = (Integer) right;
-             return  l < r;
-         }
-          else {
-              double r = (Double) right;
-              return l < r;
-         }
-
-        } else {
-            double l =   (Double) left;
-            if (right instanceof Integer) {
-                int r = (Integer) right;
-                return  l < r;
-            } else {
-                double r = (Double) right;
-                return l < r;
-            }
-        }
+        return new BoolExpression(left.toString().compareTo(right.toString()) < 0).isBoolValue();
 
     }
 
@@ -173,7 +150,7 @@ class EvalVisitor implements Visitor {
         Object left = expression.getLeft().accept(this);
         Object right = expression.getRight().accept(this);
 
-        return (Double) left <= (Double) right;
+        return new BoolExpression(left.toString().compareTo(right.toString()) <= 0).isBoolValue();
 
     }
 
@@ -182,7 +159,7 @@ class EvalVisitor implements Visitor {
         Object left = expression.getLeft().accept(this);
         Object right = expression.getRight().accept(this);
 
-        return (Double) left > (Double) right;
+        return new BoolExpression(left.toString().compareTo(right.toString()) > 0).isBoolValue();
 
     }
 
@@ -192,7 +169,7 @@ class EvalVisitor implements Visitor {
         Object left = expression.getLeft().accept(this);
         Object right = expression.getRight().accept(this);
 
-        return (Double) left >= (Double) right;
+        return new BoolExpression(left.toString().compareTo(right.toString()) >= 0).isBoolValue();
 
     }
 
