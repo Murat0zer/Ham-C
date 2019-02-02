@@ -1,24 +1,26 @@
 package interpreter.ast.statement.iteration;
 
+import interpreter.Visitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.statement.Statement;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class ForStatement extends IterationStatement {
 
-    private Expression forIndex;
-    private Expression forIncrement;
+    private Statement forIndex;
+    private Statement forIncrement;
 
-    public ForStatement(Expression boolExpression, Statement iterationBody, Expression forIndex, Expression forIncrement) {
+    public ForStatement(Expression boolExpression, Statement iterationBody, Statement forIndex, Statement forIncrement) {
         super(boolExpression, iterationBody);
         this.forIndex = forIndex;
         this.forIncrement = forIncrement;
+    }
+
+    @Override
+    public Object accept(Visitor v) {
+        return v.visit(this);
     }
 }

@@ -112,8 +112,8 @@ class EvalVisitor implements Visitor {
 
     @Override
     public Object visit(EqualExpression e) {
-        Object left =  e.getLeft().accept(this);
-        Object right =  e.getRight().accept(this);
+        Object left = e.getLeft().accept(this);
+        Object right = e.getRight().accept(this);
 
         return left.equals(right);
 
@@ -125,7 +125,7 @@ class EvalVisitor implements Visitor {
         Object left = expression.getLeft().accept(this);
         Object right = expression.getRight().accept(this);
 
-        return ( left != right);
+        return (left != right);
 
     }
 
@@ -194,8 +194,7 @@ class EvalVisitor implements Visitor {
             String l = ((String) left).replace("\"", "");
             String r = ((String) right).replace("\"", "");
             return new StrConst(l + r).getValue();
-        }
-        else if (expression.getLeftType().equals("Integer") || expression.getRightType().equals("Integer"))
+        } else if (expression.getLeftType().equals("Integer") || expression.getRightType().equals("Integer"))
             return new IntConst((Integer) left + (Integer) right).getConstInt();
         else
             return new DoubleConst((Double) left + (Double) right).getDoubleConst();
@@ -316,12 +315,36 @@ class EvalVisitor implements Visitor {
     }
 
     @Override
-    public Object visit(ExpressionOrAssignmentStatement statement) {
+    public Object visit(AssignmentStatement statement) {
+
+        Object value = statement.getExpression().accept(this);
+        table.add(statement.getId(), value);
+
+        return null;
+
+    }
+
+    @Override
+    public Object visit(ExpressionStatement statement) {
+        if (statement.getExpression() != null ) {
+            statement.getExpression().accept(this);
+        }
+
         return null;
     }
 
     @Override
     public Object visit(IfStatement statement) {
+
+        Object boolExp = statement.getBoolExpression().accept(this);
+        table.beginScope();
+        if ((boolean) boolExp) {
+            statement.getTrueBlock().accept(this);
+        } else if (statement.getElseBlock() != null) {
+            statement.getElseBlock().accept(this);
+        }
+        table.endScope();
+
         return null;
     }
 
@@ -355,7 +378,7 @@ class EvalVisitor implements Visitor {
         return null;
     }
 
-    @Override
+
     public Object visit(IterationStatement statement) {
         return null;
     }
@@ -372,6 +395,18 @@ class EvalVisitor implements Visitor {
 
     @Override
     public Object visit(ForStatement statement) {
+
+        table.beginScope();
+        if(statement.getForIndex() != null)
+            statement.getForIndex().accept(this);
+
+        while ((boolean) statement.getBoolExpression().accept(this)) {
+            statement.getIterationBody().accept(this);
+            if(statement.getForIncrement() != null)
+                statement.getForIncrement().accept(this);
+        }
+
+        table.endScope();
         return null;
     }
 

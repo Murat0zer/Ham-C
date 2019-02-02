@@ -265,30 +265,35 @@ Statement statement() :
 }
 
 Statement expressionOrAssignmentStatement() :
-{ Expression left = null; Expression right = null; }
+{ Statement statement; }
 {
-	( left = expression() (<ASSIGN> right = expression())?)? <SEMI>
+    (   LOOKAHEAD(2)
+       statement = assignmentStatement() { return statement; } |
+       statement = expressionStatement() { return statement; }
 
-	{ return new ExpressionOrAssignmentStatement(left, right); }
+
+    )
 }
 
-/*
-void assignmentStatement() :
-{}
+
+Statement assignmentStatement() :
+{ Expression expression; Token t;}
 {
-	<ID> <ASSIGN> expression() <SEMI>
+	t = <ID> <ASSIGN> expression = expression() <SEMI>
+
+	{ return new AssignmentStatement(expression, t.image); }
 }
 
-*/
 
 
-/*
-void expressionStatement() :
-{}
+
+Statement expressionStatement() :
+{ Expression expression = null; }
 {
-	expression() <SEMI> | <SEMI>
+	expression = expression() <SEMI> { return new ExpressionStatement(expression); } |
+	<SEMI> { return new ExpressionStatement(expression); }
 }
-*/
+
 
 
 
@@ -361,20 +366,23 @@ Statement labelStatement() :
 Statement iterationStatement() :
 {
     Token t; Expression boolExpression = null; Statement iterationBody;
-    Expression forIndex = null, forIncrement = null;
+    Statement forIndex = null, forIncrement = null;
 }
 {
-	  t = <WHILE> <LPAREN> boolExpression = expression() <RPAREN> iterationBody = statement()
-	      { return new WhileStatement(boolExpression, iterationBody); }
+	 <WHILE> <LPAREN> boolExpression = expression() <RPAREN> iterationBody = statement()
 
-	| t = <DO> iterationBody = statement() <WHILE> <LPAREN> boolExpression = expression() <RPAREN> <SEMI>
-          { return new interpreter.ast.statement.iteration.DoWhileStatement(boolExpression, iterationBody); }
+	 { return new WhileStatement(boolExpression, iterationBody); }
 
-	| t = <FOR> <LPAREN> (forIndex = expression())?
-	        <SEMI> (boolExpression = expression())?
-	        <SEMI> (forIncrement = expression())? <RPAREN>
-	        iterationBody = statement()
-	        { return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement ); }
+	| <DO> iterationBody = statement() <WHILE> <LPAREN> boolExpression = expression() <RPAREN> <SEMI>
+
+	  { return new DoWhileStatement(boolExpression, iterationBody); }
+
+	| <FOR> <LPAREN>
+                (LOOKAHEAD(2) forIndex = statement())? <SEMI>
+                (boolExpression = expression())? <SEMI>
+                (forIncrement = assignmentStatement())? <RPAREN>
+                iterationBody = statement()
+      { return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement ); }
 }
 Statement returnStatement() :
 { Expression expression = null; }
@@ -555,7 +563,7 @@ Expression constantExpression() :
 String unaryOperator() :
 {Token t;}
 {
-	t = <PLUS> | t=  <MINUS> | t =  <NOT>
+	t = <PLUS> { return t.image; } | t=  <MINUS> { return t.image; } | t =  <NOT> { return t.image; }
 
-	{ return t.image; }
+
 }

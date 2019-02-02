@@ -15,7 +15,6 @@
 /home/murat/Desktop/Ham-C/src/main/java/javacc/Parser.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/globalscope/struct/StructDeclaration.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/relational/LessThanExpression.java
-/home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/ExpressionOrAssignmentStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/MyInterpreter.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/LogicalAND.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/ExponentialExpression.java
@@ -49,10 +48,10 @@
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/additive/MinusExpression.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/StatementList.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/globalscope/AbstractGlobalScopeUnit.java
-/home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/MultiplicativeExpression.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/Seq.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/globalscope/SimpleInitializer.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/globalscope/GlobalVariableDeclaration.java
+/home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/AssignmentStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/SwitchBlock.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/PostfixExpression.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/additive/PlusExpression.java
@@ -61,6 +60,7 @@
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/iteration/DoWhileStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/constant/StrConst.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/Statement.java
+/home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/ExpressionStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/statement/BreakStatement.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/ExpressionList.java
 /home/murat/Desktop/Ham-C/src/main/java/interpreter/ast/expression/UnaryExpression.java

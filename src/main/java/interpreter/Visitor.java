@@ -107,7 +107,9 @@ public interface Visitor {
 
     Object visit(BreakStatement statement);
 
-    Object visit(ExpressionOrAssignmentStatement statement);
+    Object visit(AssignmentStatement statement);
+
+    Object visit(ExpressionStatement statement);
 
     Object visit(IfStatement statement);
 

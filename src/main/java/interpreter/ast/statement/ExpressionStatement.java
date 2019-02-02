@@ -7,16 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class ExpressionOrAssignmentStatement extends Statement {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExpressionStatement extends Statement {
 
-    private Expression left;
-    private Expression right;
+    private Expression expression;
 
+    @Override
     public Object accept(Visitor v) {
-       return v.visit(this);
+        return v.visit(this);
     }
 }
