@@ -12,6 +12,7 @@ public class ContinueStatement extends Statement {
 
     public Object accept(Visitor v) {
 
-        return v.visit(this);
+        v.visit(this);
+        return null;
     }
 }

@@ -109,8 +109,8 @@ TOKEN : {
 
 java.util.List start() :
 {
-    AbstractGlobalScopeUnit abstractGlobalScopeUnit;
-    java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
+     AbstractGlobalScopeUnit abstractGlobalScopeUnit;
+     java.util.List abstractGlobalScopeUnits = new java.util.ArrayList();
 }
 {
   (
@@ -125,11 +125,12 @@ java.util.List start() :
 AbstractGlobalScopeUnit globalScopeUnit() :
 { AbstractGlobalScopeUnit globalScopeUnit; }
 {
-        LOOKAHEAD(3)
-        globalScopeUnit = globalVariableDeclaration() { return globalScopeUnit; }  |
-        globalScopeUnit = functionDeclaration() { return globalScopeUnit; } |
-        globalScopeUnit = structDeclaration()  { return globalScopeUnit; }
 
+        LOOKAHEAD(3)
+        globalScopeUnit = globalStructDeclaration()  { return globalScopeUnit; } |
+        LOOKAHEAD(3)
+        globalScopeUnit = globalDeclaration() { return globalScopeUnit; } |
+        globalScopeUnit = functionDeclaration() { return globalScopeUnit; }
 }
 
 AbstractGlobalScopeUnit functionDeclaration() :
@@ -151,6 +152,7 @@ String returnType() :
 String type() :
 { Token t; }
 {
+    LOOKAHEAD(2)
 	    t = <INT> { return t.image; }
 	|   t = <DOUBLE> { return t.image; }
 	|   t = <BOOL> { return t.image; }
@@ -173,37 +175,78 @@ java.util.List formalList() :
 		{ return parameterList; }
 }
 
-StructDeclaration structDeclaration() :
-{}
-{
-	<STRUCT> <ID> <LBRACE> structMemberDeclarations() <RBRACE> <SEMI>
 
-	{ return new StructDeclaration(); }
+AbstractGlobalScopeUnit globalStructDeclaration() :
+{ String type; Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions;}
+{
+
+    (LOOKAHEAD(2) type = type())? id = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new GlobalStructDeclaration(type, id.image, definitions, constToken); }
 
 }
 
-StructMemberDeclaration structMemberDeclarations() :
-{}
+java.util.Set structMemberDeclarations() :
 {
-	type() <ID> <SEMI> (type() <ID> <SEMI>)*
+    java.util.Set<VariableDeclarationStatement> structMemberDeclarations;
+    structMemberDeclarations = new java.util.HashSet();
+    String type; Token t;
+}
+{
+	type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
+	{ structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
 
-		{ return new StructMemberDeclaration(); }
+	(
+	 type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
+	 { structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
+	)*
 
+	{ return structMemberDeclarations; }
+
+}
+
+AbstractGlobalScopeUnit globalDeclaration() :
+{ AbstractGlobalScopeUnit globalVariable =  null; }
+{
+      LOOKAHEAD(5)
+	  globalVariable = globalStructAssigment()
+	 { return globalVariable; }
+
+    |
+	  globalVariable = globalVariableDeclaration()
+	 { return globalVariable; }
+
+}
+
+AbstractGlobalScopeUnit globalStructAssigment() :
+{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions; }
+{
+     id = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new GlobalStructAssigment(id.image, definitions, constToken); }
 }
 
 AbstractGlobalScopeUnit globalVariableDeclaration() :
-{ String type; Token id, constToken = null; Expression value; }
+{ String type; Token id, constToken = null; Expression value = null;}
 {
-	(constToken = <CONST>)? type = type() id = <ID> <ASSIGN> value = initializer() <SEMI>
+    (constToken = <CONST> )* type = type() id = <ID> ( <ASSIGN> value = initializer() )* <SEMI>
+    { return new GlobalVariableDeclaration(type, id.image, value, constToken); }
 
-	{ return new GlobalVariableDeclaration(type, id.image, value, constToken); }
 }
 
 Expression initializer() :
 { Expression expression; }
 {
 	expression = simpleInitializer() { return new SimpleInitializer(expression); }
-	| <LBRACE> structInitializer() <RBRACE> { return new SimpleInitializer(); }
+	| <LBRACE> expression = structInitializer() <RBRACE>
+	  { return new SimpleInitializer(new StructInitializer(expression)); }
+
+}
+
+Expression structInitializer() :
+{ Expression expression; Expression expression2 = null; }
+{
+	expression = simpleInitializer() ( LOOKAHEAD(2) <COMMA>  expression2 = structInitializer())*
+
+	{ return new ExpressionList(expression, expression2); }
 }
 
 Expression simpleInitializer() :
@@ -216,11 +259,6 @@ Expression simpleInitializer() :
     t = <STRCONST> { return new StrConst(t.image); }
 }
 
-StructInitializer structInitializer() :
-{}
-{
-	initializer() { return new StructInitializer(); } (<COMMA> initializer() { return new StructInitializer(); })*
-}
 
 Statement compoundStatement() :
 {Statement s1,s2;}
@@ -267,24 +305,26 @@ Statement statement() :
 Statement expressionOrAssignmentStatement() :
 { Statement statement; }
 {
-    (   LOOKAHEAD(2)
+       LOOKAHEAD(2)
        statement = assignmentStatement() { return statement; } |
        statement = expressionStatement() { return statement; }
-
-
-    )
 }
 
-
 Statement assignmentStatement() :
-{ Expression expression; Token t;}
+{ Expression expression; Token t; java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
+}
 {
+    LOOKAHEAD(2)
 	t = <ID> <ASSIGN> expression = expression() <SEMI>
 
 	{ return new AssignmentStatement(expression, t.image); }
+
+	|
+
+	t = <ID> <ASSIGN> <LBRACE> structMemberDefinitions = structMemberDeclarations() <RBRACE> <SEMI>
+
+    { return new StructAssignmentStatement(t.image, structMemberDefinitions); }
 }
-
-
 
 
 Statement expressionStatement() :
@@ -298,11 +338,30 @@ Statement expressionStatement() :
 
 
 Statement variableDeclarationStatement() :
-{ String type = null; Token t; Expression valueExp = null;}
 {
+  String type,constToken = null; Token t; Expression valueExp = null;
+  java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
+}
+{
+    LOOKAHEAD(2)
 	(<CONST>)? type = type() t = <ID> (<ASSIGN> valueExp = expression())? <SEMI>
 
 	{ return new VariableDeclarationStatement(type, t.image, valueExp); }
+
+	|
+
+	(<CONST>)? type = type() t = <ID> (<ASSIGN> <LBRACE> structMemberDefinitions = structMemberDeclarations() )? <RBRACE> <SEMI>
+
+    { return new StructDeclarationStatement(type, t.image, structMemberDefinitions, constToken ); }
+}
+
+AbstractGlobalScopeUnit structDeclaration() :
+{ Token t; java.util.Set<VariableDeclarationStatement> structMemberDeclarations;}
+{
+	<STRUCT> t = <ID> <LBRACE> structMemberDeclarations = structMemberDeclarations() <RBRACE> <SEMI>
+
+	{ return new StructDeclaration(t.image, structMemberDeclarations ); }
+
 }
 
 
@@ -324,29 +383,36 @@ Statement ifStatement() :
 
 
 Statement switchStatement() :
-{}
+{ Expression switchExpression; Statement switchBlock;}
 {
-	<SWITCH> <LPAREN> expression() <RPAREN> <LBRACE> switchBlock() <RBRACE>
+	<SWITCH> <LPAREN> switchExpression = primaryExpression() <RPAREN> <LBRACE> switchBlock = switchBlock(switchExpression) <RBRACE>
 
-	{ return new SwitchStatement(); }
+	{ return new SwitchStatement(switchExpression, switchBlock); }
 }
 
-Statement switchBlock() :
-{ Statement labelBlock, switchBlock; }
+Statement switchBlock(Expression switchExpression) :
+{ Statement labelBlock, switchBlock=null; }
 {
-	labelBlock = labelBlock() ( switchBlock = labelBlock() { return new SwitchBlock(labelBlock, switchBlock); })*
+	labelBlock = labelBlock(switchExpression)
+	(
+	    LOOKAHEAD(2)
+	    switchBlock = switchBlock(switchExpression)
+	    { return new SwitchBlock(labelBlock, switchBlock); }
+	)*
 
-	{ return labelBlock;}
+	{ return new SwitchBlock(labelBlock, switchBlock);}
 }
 
-Statement labelBlock() :
-{ Expression constantExpression = null; Statement labelStatement; }
+Statement labelBlock(Expression switchExpression) :
+{ Expression constantExpression = null; Statement labelStatement = null; }
 {
-	<CASE> constantExpression = constantExpression() <COLON> labelStatement = labelStatement()
+	  <CASE> constantExpression = constantExpression() <COLON> labelStatement = labelStatement()
+
+	  { return new LabelBlock(constantExpression, labelStatement, switchExpression); }
 
 	| <DEFAULT_> <COLON> labelStatement = labelStatement()
 
-	{ return new LabelBlock(constantExpression, labelStatement); }
+	{ return new LabelBlock(constantExpression, labelStatement, switchExpression); }
 }
 
 Statement labelStatement() :
@@ -380,7 +446,7 @@ Statement iterationStatement() :
 	| <FOR> <LPAREN>
                 (LOOKAHEAD(2) ( LOOKAHEAD(2) forIndex = statement())? | <SEMI> )
                 boolExpression = expression()  <SEMI>
-                (LOOKAHEAD(2) (forIncrement = statement())?)
+                (LOOKAHEAD(2) forIncrement = statement())?
             <RPAREN>
                 iterationBody = statement()
 

@@ -22,9 +22,7 @@ import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.FunctionDeclaration;
 import interpreter.ast.globalscope.GlobalVariableDeclaration;
 import interpreter.ast.globalscope.SimpleInitializer;
-import interpreter.ast.globalscope.struct.StructDeclaration;
-import interpreter.ast.globalscope.struct.StructInitializer;
-import interpreter.ast.globalscope.struct.StructMemberDeclaration;
+import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.*;
 import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
@@ -52,16 +50,75 @@ class EvalVisitor implements Visitor {
 
     }
 
-    public void visit(StructDeclaration structDeclaration) {
+    public void visit(StructMemberDeclaration structMemberDeclaration) {
+
     }
+
+    public void visit(StructDeclaration structDeclaration) {
+        Map<String, Object> structVariables = new HashMap<>();
+        String structId = structDeclaration.getId();
+        structDeclaration.getStructMemberDeclarations().forEach(variableDeclarationStatement -> {
+            Object value = variableDeclarationStatement.getValueExp().accept(this);
+            String variableId = variableDeclarationStatement.getId();
+            structVariables.put(variableId, value);
+        });
+        table.addStructDefinition(structId, structVariables);    }
+
+    public void visit(StructInitializer structInitializer) {
+        ExpressionList  expressionList = (ExpressionList) structInitializer.getExpressions();
+        expressionList.getE1().accept(this);
+        if(expressionList.getE2() != null)
+            expressionList.getE2().accept(this);
+
+    }
+
+    public void visit(GlobalStructDeclaration globalStructDeclaration) {
+
+        table.beginScope();
+        Map<String, Object> structVariables = new HashMap<>();
+        String structId = globalStructDeclaration.getId();
+        globalStructDeclaration.getStatements().forEach(variableDeclarationStatement -> {
+            Object value = variableDeclarationStatement.getValueExp().accept(this);
+            String variableId = variableDeclarationStatement.getId();
+            structVariables.put(variableId, value);
+        });
+        table.addStructDefinition(structId, structVariables);
+    }
+
+    @Override
+    public Object visit(GlobalStructAssigment globalStructAssigment) {
+
+        String structId = globalStructAssigment.getId();
+
+        Map<String, Object>  assignedStructValues = new HashMap<>();
+
+        globalStructAssigment.getStatements().forEach(variableDeclarationStatement -> {
+            Object value = variableDeclarationStatement.getValueExp().accept(this);
+            String variableId = variableDeclarationStatement.getId();
+            assignedStructValues.put(variableId, value);
+
+        });
+
+        table.assignStruct(structId, assignedStructValues);
+        return null;
+    }
+
+    @Override
+    public Object visit(StructDeclarationStatement structDeclarationStatement) {
+        return null;
+    }
+
+    @Override
+    public Object visit(StructAssignmentStatement structAssignmentStatement) {
+        return null;
+    }
+
 
     public void visit(GlobalVariableDeclaration globalVariableDeclaration) {
         if (table.fp == -1)
             table.beginScope();
         Object expression = globalVariableDeclaration.getValue().accept(this);
         table.add(globalVariableDeclaration.getId(), expression);
-
-
     }
 
     public Object visit(IntConst exp) {
@@ -80,8 +137,11 @@ class EvalVisitor implements Visitor {
 
         Statement statementList = null;
         Statement statement = (Statement) s.getStatement().accept(this);
+        brk = false;
+        cnt = false;
         if (Objects.nonNull(s.getStatementList()))
             statementList = (Statement) s.getStatementList().accept(this);
+
         return new StatementList(statement, statementList);
     }
 
@@ -245,20 +305,17 @@ class EvalVisitor implements Visitor {
     }
 
     public Object visit(UnaryExpression e) {
-        Object n1 = e.getExpression().accept(this);
-        return n1;
+        return e.getExpression().accept(this);
     }
 
 
     public Expression visit(PrimaryExpression e) {
-        Expression n1 = (Expression) e.getExp().accept(this);
-        return n1;
+        return (Expression) e.getExp().accept(this);
     }
 
 
     public Object visit(ConstantExpression e) {
-        Object n1 = e.getConstantValue().accept(this);
-        return n1;
+        return e.getConstantValue().accept(this);
     }
 
     public Expression visit(PrimaryExpressionPrime e) {
@@ -267,8 +324,14 @@ class EvalVisitor implements Visitor {
     }
 
 
-    public Expression visit(ExpressionList e) {
-        return null;
+    public Object visit(ExpressionList e) {
+        Object expression = e.getE1().accept(this);
+
+        ExpressionList expressionList;
+        if(e.getE2() != null)
+             return e.getE2().accept(this);
+
+        return expression;
     }
 
 
@@ -282,20 +345,12 @@ class EvalVisitor implements Visitor {
     }
 
 
-    public void visit(StructMemberDeclaration structMemberDeclaration) {
-
-    }
-
-
     public Object visit(SimpleInitializer simpleInitializer) {
-        return simpleInitializer.getExpression().accept(this);
+        if(simpleInitializer.getExpression() != null)
+          return simpleInitializer.getExpression().accept(this);
+        else
+           return simpleInitializer.getStructInitializer().getExpressions().accept(this);
     }
-
-
-    public void visit(StructInitializer structInitializer) {
-
-    }
-
 
     public Object visit(VariableDeclarationStatement statement) {
 
@@ -305,13 +360,13 @@ class EvalVisitor implements Visitor {
     }
 
     @Override
-    public Object visit(ContinueStatement statement) {
-        return null;
+    public void visit(ContinueStatement statement) {
+        cnt = true;
     }
 
     @Override
-    public Object visit(BreakStatement statement) {
-        return null;
+    public void visit(BreakStatement statement) {
+        brk = true;
     }
 
     @Override
@@ -350,6 +405,56 @@ class EvalVisitor implements Visitor {
 
     @Override
     public Object visit(LabelStatement statement) {
+
+        return statement.getStatementList().accept(this);
+    }
+
+
+
+    @Override
+    public Object visit(SwitchBlock statement) {
+
+        LabelBlock labelBlock = ((LabelBlock) statement.getLabelBlock());
+        BoolExpression isDefaultLabel = new BoolExpression(Objects.isNull(labelBlock.getLabelExpression()));
+
+        if(isDefaultLabel.isBoolValue())
+            SwitchBlock.setDefaultStatement(labelBlock.getLabelStatement());
+
+        // burdan null donerse eşleşen case bulunmamıştır
+        // eger default label ise ignore ediyoruz.
+        if(!isDefaultLabel.isBoolValue())
+            SwitchBlock.setIsCaseFound(new BoolExpression(Objects.nonNull(statement.getLabelBlock().accept(this))));
+
+        // eger null ise. butun switch caseleri denenmis ve istenilen sonuc bulunamamistir.
+        boolean hasMoreLabelBlocks;
+        hasMoreLabelBlocks = (Objects.nonNull(statement.getSwitchBlock()));
+
+
+        if(!SwitchBlock.getIsCaseFound().isBoolValue() && hasMoreLabelBlocks) {
+            statement.getSwitchBlock().accept(this);
+            return null;
+        }
+        boolean isDefaultCaseExists = Objects.nonNull(SwitchBlock.getDefaultStatement());
+        if (!SwitchBlock.getIsCaseFound().isBoolValue() && !hasMoreLabelBlocks && isDefaultCaseExists )
+            SwitchBlock.getDefaultStatement().accept(this);
+        return  null;
+    }
+
+    @Override
+    public Object visit(SwitchStatement statement) {
+
+         return statement.getSwitchBlock().accept(this);
+    }
+
+    @Override
+    public Object visit(LabelBlock statement) {
+
+        Object labelExpression = statement.getLabelExpression().accept(this);
+        Object switchExpression = statement.getSwitchExpression().accept(this);
+
+        if (labelExpression.equals(switchExpression))
+            return statement.getLabelStatement().accept(this);
+
         return null;
     }
 
@@ -359,25 +464,9 @@ class EvalVisitor implements Visitor {
     }
 
     @Override
-    public Object visit(SwitchBlock statement) {
-        return null;
-    }
-
-    @Override
-    public Object visit(SwitchStatement statement) {
-        return null;
-    }
-
-    @Override
     public Object visit(CompoundStatement statement) {
         return null;
     }
-
-    @Override
-    public Object visit(LabelBlock statement) {
-        return null;
-    }
-
 
     public Object visit(IterationStatement statement) {
         return null;
@@ -402,6 +491,9 @@ class EvalVisitor implements Visitor {
 
         while ((boolean) statement.getBoolExpression().accept(this)) {
             statement.getIterationBody().accept(this);
+            if (brk) {
+                break;
+            }
             if(statement.getForIncrement() != null)
                 statement.getForIncrement().accept(this);
         }
@@ -424,5 +516,4 @@ class EvalVisitor implements Visitor {
         table.fp = fpTemp;
         return value;
     }
-
 }

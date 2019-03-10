@@ -22,9 +22,7 @@ import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.FunctionDeclaration;
 import interpreter.ast.globalscope.GlobalVariableDeclaration;
 import interpreter.ast.globalscope.SimpleInitializer;
-import interpreter.ast.globalscope.struct.StructDeclaration;
-import interpreter.ast.globalscope.struct.StructInitializer;
-import interpreter.ast.globalscope.struct.StructMemberDeclaration;
+import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.*;
 import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
@@ -44,6 +42,8 @@ public interface Visitor {
     void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit);
 
     void visit(GlobalVariableDeclaration globalVariableDeclaration);
+
+    void visit(GlobalStructDeclaration globalStructDeclaration);
 
     void visit(StructDeclaration structDeclaration);
 
@@ -103,9 +103,9 @@ public interface Visitor {
 
     Object visit(VariableDeclarationStatement statement);
 
-    Object visit(ContinueStatement statement);
+    void visit(ContinueStatement statement);
 
-    Object visit(BreakStatement statement);
+    void visit(BreakStatement statement);
 
     Object visit(AssignmentStatement statement);
 
@@ -135,8 +135,10 @@ public interface Visitor {
 
     Object visit(ForStatement statement);
 
+    Object visit(StructDeclarationStatement structDeclarationStatement);
 
+    Object visit(StructAssignmentStatement structAssignmentStatement);
 
-
+    Object visit(GlobalStructAssigment globalStructAssigment);
 
 }

@@ -10,16 +10,19 @@ import lombok.Setter;
 
 import java.util.Set;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class StructDeclaration extends AbstractGlobalScopeUnit {
+@NoArgsConstructor
+public class GlobalStructDeclaration extends AbstractGlobalScopeUnit {
 
-    private String id;
-    private Set<VariableDeclarationStatement> structMemberDeclarations;
+  private String type;
+  private String id;
+  private Set<VariableDeclarationStatement> statements;
+  private Object constToken;
 
-    public void accept(Visitor v) {
-        v.visit(this);
-        }
+  @Override
+  public void accept(Visitor v) {
+    v.visit(this);
+  }
 }

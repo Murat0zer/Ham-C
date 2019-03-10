@@ -1,9 +1,8 @@
 package interpreter.ast.globalscope.struct;
 
 import interpreter.Visitor;
-import interpreter.ast.expression.Expression;
-import interpreter.ast.expression.ExpressionList;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.ast.statement.VariableDeclarationStatement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +14,14 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StructInitializer extends AbstractGlobalScopeUnit {
+public class GlobalStructAssigment extends AbstractGlobalScopeUnit {
 
-    private Expression expressions;
+  private String id;
+  private Set<VariableDeclarationStatement> statements;
+  private Object constToken;
 
-    public void accept(Visitor v) {
-        v.visit(this);
-    }
+  @Override
+  public void accept(Visitor v) {
+    v.visit(this);
+  }
 }

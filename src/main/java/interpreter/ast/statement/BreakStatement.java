@@ -15,6 +15,7 @@ public class BreakStatement extends Statement {
     private Statement statement;
 
     public Object accept(Visitor v) {
-       return v.visit(this);
+        v.visit(this);
+        return null;
     }
 }
