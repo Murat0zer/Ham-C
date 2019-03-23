@@ -985,11 +985,37 @@ public class Parser implements ParserConstants {
         } else {
           ;
         }
-        boolExpression = expression();
         jj_consume_token(SEMI);
+<<<<<<< HEAD
         if (jj_2_15(2)) {
           forIncrement = statement();
         } else {
+=======
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case TRUE:
+        case FALSE:
+        case LPAREN:
+        case PLUS:
+        case MINUS:
+        case NOT:
+        case ID:
+        case INTCONST:
+        case DOUBLECONST:
+        case STRCONST:
+          boolExpression = expression();
+          break;
+        default:
+          jj_la1[23] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
+          ;
+        }
+        jj_consume_token(SEMI);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ID:
+          forIncrement = assignmentStatement();
+          break;
+        default:
+          jj_la1[24] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
@@ -997,7 +1023,11 @@ public class Parser implements ParserConstants {
         {if (true) return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement );}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[29] = jj_gen;
+=======
+        jj_la1[25] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1026,7 +1056,11 @@ public class Parser implements ParserConstants {
         expression = expression();
         break;
       default:
+<<<<<<< HEAD
         jj_la1[30] = jj_gen;
+=======
+        jj_la1[26] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         ;
       }
       jj_consume_token(SEMI);
@@ -1101,8 +1135,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[31] = jj_gen;
           break label_10;
+=======
+          jj_la1[27] = jj_gen;
+          break label_8;
+>>>>>>> parent of ab6069f... --amend
         }
         jj_consume_token(OR);
         e2 = logicalAnd();
@@ -1127,8 +1166,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[32] = jj_gen;
           break label_11;
+=======
+          jj_la1[28] = jj_gen;
+          break label_9;
+>>>>>>> parent of ab6069f... --amend
         }
         jj_consume_token(AND);
         e2 = equalityExpression();
@@ -1154,8 +1198,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[33] = jj_gen;
           break label_12;
+=======
+          jj_la1[29] = jj_gen;
+          break label_10;
+>>>>>>> parent of ab6069f... --amend
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case EQUAL:
@@ -1169,7 +1218,11 @@ public class Parser implements ParserConstants {
                                                          e1 = new NotEqualExpression(e1, e2);
           break;
         default:
+<<<<<<< HEAD
           jj_la1[34] = jj_gen;
+=======
+          jj_la1[30] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1196,8 +1249,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[35] = jj_gen;
           break label_13;
+=======
+          jj_la1[31] = jj_gen;
+          break label_11;
+>>>>>>> parent of ab6069f... --amend
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case LESSTHAN:
@@ -1221,7 +1279,11 @@ public class Parser implements ParserConstants {
                                                        e1 = new GreaterEqualExpression(e1, e2);
           break;
         default:
+<<<<<<< HEAD
           jj_la1[36] = jj_gen;
+=======
+          jj_la1[32] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1246,8 +1308,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[37] = jj_gen;
           break label_14;
+=======
+          jj_la1[33] = jj_gen;
+          break label_12;
+>>>>>>> parent of ab6069f... --amend
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case PLUS:
@@ -1261,7 +1328,11 @@ public class Parser implements ParserConstants {
                                                           e1 = new MinusExpression(e1, e2);
           break;
         default:
+<<<<<<< HEAD
           jj_la1[38] = jj_gen;
+=======
+          jj_la1[34] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1286,8 +1357,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[39] = jj_gen;
           break label_15;
+=======
+          jj_la1[35] = jj_gen;
+          break label_13;
+>>>>>>> parent of ab6069f... --amend
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TIMES:
@@ -1301,7 +1377,11 @@ public class Parser implements ParserConstants {
                                                      e1 = new DivideExpression(e1, e2);
           break;
         default:
+<<<<<<< HEAD
           jj_la1[40] = jj_gen;
+=======
+          jj_la1[36] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1325,8 +1405,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[41] = jj_gen;
           break label_16;
+=======
+          jj_la1[37] = jj_gen;
+          break label_14;
+>>>>>>> parent of ab6069f... --amend
         }
         jj_consume_token(POWER);
         e2 = unaryExpression();
@@ -1362,7 +1447,11 @@ public class Parser implements ParserConstants {
                                       {if (true) return new UnaryExpression(e1, unaryOp);}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[42] = jj_gen;
+=======
+        jj_la1[38] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1385,8 +1474,13 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
+<<<<<<< HEAD
           jj_la1[43] = jj_gen;
           break label_17;
+=======
+          jj_la1[39] = jj_gen;
+          break label_15;
+>>>>>>> parent of ab6069f... --amend
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case LBRACK:
@@ -1401,7 +1495,11 @@ public class Parser implements ParserConstants {
                                {if (true) return new PostfixExpression(e1, e2, t.image);}
           break;
         default:
+<<<<<<< HEAD
           jj_la1[44] = jj_gen;
+=======
+          jj_la1[40] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1437,7 +1535,11 @@ public class Parser implements ParserConstants {
                        {if (true) return new IdExpression(t.image);}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[45] = jj_gen;
+=======
+        jj_la1[41] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1459,7 +1561,11 @@ public class Parser implements ParserConstants {
                                                     {if (true) return new PrimaryExpressionPrime(e1);}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[46] = jj_gen;
+=======
+        jj_la1[42] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         ;
       }
           {if (true) return  e1;}
@@ -1492,8 +1598,13 @@ public class Parser implements ParserConstants {
             ;
             break;
           default:
+<<<<<<< HEAD
             jj_la1[47] = jj_gen;
             break label_18;
+=======
+            jj_la1[43] = jj_gen;
+            break label_16;
+>>>>>>> parent of ab6069f... --amend
           }
           jj_consume_token(COMMA);
           e2 = expression();
@@ -1501,7 +1612,11 @@ public class Parser implements ParserConstants {
         }
         break;
       default:
+<<<<<<< HEAD
         jj_la1[48] = jj_gen;
+=======
+        jj_la1[44] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         ;
       }
           {if (true) return new ExpressionList(e1, e2);}
@@ -1537,7 +1652,11 @@ public class Parser implements ParserConstants {
                            {if (true) return new StrConst(t.image);}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[49] = jj_gen;
+=======
+        jj_la1[45] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1565,7 +1684,11 @@ public class Parser implements ParserConstants {
                                                                                         {if (true) return t.image;}
         break;
       default:
+<<<<<<< HEAD
         jj_la1[50] = jj_gen;
+=======
+        jj_la1[46] = jj_gen;
+>>>>>>> parent of ab6069f... --amend
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1617,11 +1740,32 @@ public class Parser implements ParserConstants {
     finally { jj_save(5, xla); }
   }
 
+<<<<<<< HEAD
   static private boolean jj_2_7(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_7(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(6, xla); }
+=======
+  static private boolean jj_3R_101() {
+    if (jj_scan_token(STRCONST)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_100() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_99() {
+    if (jj_scan_token(TRUE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_98() {
+    if (jj_scan_token(DOUBLECONST)) return true;
+    return false;
+>>>>>>> parent of ab6069f... --amend
   }
 
   static private boolean jj_2_8(int xla) {
@@ -1774,6 +1918,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_30() {
     if (jj_scan_token(DOUBLE)) return true;
     return false;
@@ -1781,6 +1926,11 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3R_100() {
     if (jj_scan_token(GREATEREQUAL)) return true;
+=======
+  static private boolean jj_3R_52() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1789,8 +1939,23 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_98() {
     if (jj_scan_token(LESSEQUAL)) return true;
+=======
+  static private boolean jj_3R_81() {
+    if (jj_scan_token(POWER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_69() {
+    if (jj_3R_75()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_81()) { jj_scanpos = xsp; break; }
+    }
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1878,6 +2043,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_81() {
     if (jj_3R_75()) return true;
     if (jj_scan_token(SEMI)) return true;
@@ -1896,6 +2062,10 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3R_93() {
     if (jj_scan_token(EQUAL)) return true;
+=======
+  static private boolean jj_3R_56() {
+    if (jj_scan_token(SEMI)) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1909,8 +2079,29 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_85() {
     if (jj_3R_87()) return true;
+=======
+  static private boolean jj_3R_55() {
+    if (jj_3R_54()) return true;
+    if (jj_scan_token(SEMI)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_70() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_77()) {
+    jj_scanpos = xsp;
+    if (jj_3R_78()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_63() {
+    if (jj_3R_65()) return true;
+>>>>>>> parent of ab6069f... --amend
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
@@ -1919,14 +2110,28 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_45() {
+=======
+  static private boolean jj_3R_21() {
+>>>>>>> parent of ab6069f... --amend
     if (jj_scan_token(ID)) return true;
     if (jj_scan_token(ASSIGN)) return true;
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3_2() {
     if (jj_3R_20()) return true;
+=======
+  static private boolean jj_3R_74() {
+    if (jj_scan_token(GREATEREQUAL)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_73() {
+    if (jj_scan_token(GREATERTHAN)) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1945,8 +2150,18 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_84() {
     if (jj_3R_85()) return true;
+=======
+  static private boolean jj_3R_44() {
+    if (jj_3R_51()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_61() {
+    if (jj_3R_63()) return true;
+>>>>>>> parent of ab6069f... --amend
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
@@ -1955,6 +2170,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_27() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1962,6 +2178,10 @@ public class Parser implements ParserConstants {
     jj_scanpos = xsp;
     if (jj_3R_45()) return true;
     }
+=======
+  static private boolean jj_3_5() {
+    if (jj_3R_21()) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1971,6 +2191,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_86() {
     if (jj_scan_token(OR)) return true;
     return false;
@@ -1978,6 +2199,15 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3R_64() {
     if (jj_3R_72()) return true;
+=======
+  static private boolean jj_3R_36() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_5()) {
+    jj_scanpos = xsp;
+    if (jj_3R_44()) return true;
+    }
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -1986,6 +2216,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_53() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2003,6 +2234,25 @@ public class Parser implements ParserConstants {
       xsp = jj_scanpos;
       if (jj_3R_86()) { jj_scanpos = xsp; break; }
     }
+=======
+  static private boolean jj_3R_29() {
+    if (jj_3R_42()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_28() {
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_67() {
+    if (jj_scan_token(EQUAL)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_27() {
+    if (jj_3R_40()) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -2011,6 +2261,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_42() {
     if (jj_3R_59()) return true;
     return false;
@@ -2023,6 +2274,10 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3R_40() {
     if (jj_3R_57()) return true;
+=======
+  static private boolean jj_3R_26() {
+    if (jj_3R_39()) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -2041,6 +2296,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_37() {
     if (jj_3R_54()) return true;
     return false;
@@ -2048,6 +2304,10 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3R_36() {
     if (jj_3R_53()) return true;
+=======
+  static private boolean jj_3_4() {
+    if (jj_3R_20()) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -2082,8 +2342,23 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3_9() {
     if (jj_3R_26()) return true;
+=======
+  static private boolean jj_3R_59() {
+    if (jj_3R_61()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_64()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_62() {
+    if (jj_scan_token(AND)) return true;
+>>>>>>> parent of ab6069f... --amend
     return false;
   }
 
@@ -2093,6 +2368,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_113() {
     if (jj_scan_token(MINUS)) return true;
     return false;
@@ -2111,6 +2387,15 @@ public class Parser implements ParserConstants {
 
   static private boolean jj_3_8() {
     if (jj_3R_25()) return true;
+=======
+  static private boolean jj_3_2() {
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_58() {
+    if (jj_3R_59()) return true;
+>>>>>>> parent of ab6069f... --amend
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
@@ -2119,6 +2404,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3_6() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_23()) return true;
@@ -2136,6 +2422,10 @@ public class Parser implements ParserConstants {
   }
 
   static private boolean jj_3R_24() {
+=======
+  static private boolean jj_3_3() {
+    if (jj_3R_19()) return true;
+>>>>>>> parent of ab6069f... --amend
     Token xsp;
     if (jj_3_8()) return true;
     while (true) {
@@ -2453,6 +2743,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+<<<<<<< HEAD
   static private boolean jj_3R_28() {
     if (jj_3R_46()) return true;
     return false;
@@ -2470,6 +2761,9 @@ public class Parser implements ParserConstants {
   }
 
   static private boolean jj_3R_101() {
+=======
+  static private boolean jj_3R_39() {
+>>>>>>> parent of ab6069f... --amend
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_105()) {
@@ -2544,7 +2838,11 @@ public class Parser implements ParserConstants {
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
+<<<<<<< HEAD
   static final private int[] jj_la1 = new int[51];
+=======
+  static final private int[] jj_la1 = new int[47];
+>>>>>>> parent of ab6069f... --amend
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -2552,10 +2850,17 @@ public class Parser implements ParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
+<<<<<<< HEAD
       jj_la1_0 = new int[] {0x3e40000,0x3e00000,0x3e00000,0x3800000,0x200000,0x0,0x40000,0x0,0x3c00000,0x0,0x3c40000,0x40000,0x0,0x40180000,0x180000,0x40000000,0x441acf40,0x4180000,0x0,0x4180000,0x40000,0x0,0x40000,0x0,0x3c40000,0x840,0x80,0x3000,0x47decf40,0x700,0x4180000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4180000,0x10000000,0x10000000,0x4180000,0x4000000,0x0,0x4180000,0x180000,0x0,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x2000000,0x2000000,0x2000000,0x2000000,0x0,0x2,0x0,0x400,0x2000000,0x400,0x2000000,0x0,0x400,0x1c000000,0x1c000000,0x0,0x1e102031,0x1e002031,0x2000000,0x1e002031,0x0,0x400,0x0,0x400,0x2000000,0x0,0x0,0x0,0x1e102031,0x0,0x1e002030,0x1000,0x800,0xc000,0xc000,0xf0000,0xf0000,0x30,0x30,0xc0,0xc0,0x200,0x1e002030,0x8,0x8,0x1e000000,0x0,0x2,0x1e002030,0x1c000000,0x2030,};
+=======
+      jj_la1_0 = new int[] {0x3e50000,0x3e10000,0x3e00000,0x3c00000,0x200000,0x0,0x40000,0x3c00000,0x40000,0x40180000,0x180000,0x0,0x40000000,0x441acf40,0x4180000,0x4180000,0x40000,0x0,0x840,0x80,0x3000,0x3000,0x47decf40,0x4180000,0x0,0x700,0x4180000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4180000,0x10000000,0x10000000,0x4180000,0x4000000,0x0,0x4180000,0x180000,0x0,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x2000000,0x2000000,0x2000000,0x2000000,0x0,0x2,0x0,0x2000000,0x0,0x1c000000,0x1c000000,0x2,0x0,0x1e102031,0x1e002031,0x1e002031,0x0,0x400,0x0,0x0,0x0,0x0,0x1e102031,0x1e002030,0x2000000,0x0,0x1e002030,0x1000,0x800,0xc000,0xc000,0xf0000,0xf0000,0x30,0x30,0xc0,0xc0,0x200,0x1e002030,0x8,0x8,0x1e000000,0x0,0x2,0x1e002030,0x1c000000,0x2030,};
+>>>>>>> parent of ab6069f... --amend
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[15];
   static private boolean jj_rescan = false;
@@ -2579,7 +2884,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2594,7 +2903,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2612,7 +2925,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2623,7 +2940,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2640,7 +2961,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2650,7 +2975,11 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) jj_la1[i] = -1;
+=======
+    for (int i = 0; i < 47; i++) jj_la1[i] = -1;
+>>>>>>> parent of ab6069f... --amend
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2769,7 +3098,11 @@ public class Parser implements ParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
+<<<<<<< HEAD
     for (int i = 0; i < 51; i++) {
+=======
+    for (int i = 0; i < 47; i++) {
+>>>>>>> parent of ab6069f... --amend
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

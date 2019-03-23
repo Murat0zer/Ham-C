@@ -599,6 +599,7 @@ Was expecting:
     ";" ...
     
 ERROR main interpreter.MyInterpreter - 
+<<<<<<< HEAD
 ERROR main interpreter.MyInterpreter - Encountered " <ID> "i "" at line 29, column 17.
 Was expecting:
     ";" ...
@@ -1075,3 +1076,5 @@ ERROR main interpreter.MyInterpreter - Encountered " "," ", "" at line 8, column
 Was expecting:
     "}" ...
     
+=======
+>>>>>>> parent of ab6069f... --amend
