@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class GlobalStructAssigment extends AbstractGlobalScopeUnit {
 
-  private String id;
+  private String structInstanceId;
   private Set<VariableDeclarationStatement> statements;
   private Object constToken;
 

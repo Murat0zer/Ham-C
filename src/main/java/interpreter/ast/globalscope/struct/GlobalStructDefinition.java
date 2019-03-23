@@ -14,10 +14,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GlobalStructDeclaration extends AbstractGlobalScopeUnit {
+public class GlobalStructDefinition extends AbstractGlobalScopeUnit {
 
-  private String type;
-  private String id;
+  private String structId;
+  private String structInstanceId;
   private Set<VariableDeclarationStatement> statements;
   private Object constToken;
 

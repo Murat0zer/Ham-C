@@ -16,8 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class StructDeclaration extends AbstractGlobalScopeUnit {
 
-    private String id;
-    private Set<VariableDeclarationStatement> structMemberDeclarations;
+    private String structId;
+    private Set<VariableDeclarationStatement> statements;
+    private Object constToken;
 
     public void accept(Visitor v) {
         v.visit(this);

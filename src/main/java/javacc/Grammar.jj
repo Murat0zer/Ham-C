@@ -127,7 +127,9 @@ AbstractGlobalScopeUnit globalScopeUnit() :
 {
 
         LOOKAHEAD(3)
-        globalScopeUnit = globalStructDeclaration()  { return globalScopeUnit; } |
+        globalScopeUnit = structDeclaration()  { return globalScopeUnit; } |
+        LOOKAHEAD(3)
+        globalScopeUnit = globalStructDefinition() { return globalScopeUnit; } |
         LOOKAHEAD(3)
         globalScopeUnit = globalDeclaration() { return globalScopeUnit; } |
         globalScopeUnit = functionDeclaration() { return globalScopeUnit; }
@@ -176,28 +178,67 @@ java.util.List formalList() :
 }
 
 
-AbstractGlobalScopeUnit globalStructDeclaration() :
-{ String type; Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions;}
+AbstractGlobalScopeUnit structDeclaration() :
+{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions;}
 {
 
-    (LOOKAHEAD(2) type = type())? id = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new GlobalStructDeclaration(type, id.image, definitions, constToken); }
+    <STRUCT> id = <ID>  <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new StructDeclaration(id.image, definitions, constToken); }
 
+}
+
+AbstractGlobalScopeUnit globalStructDefinition() :
+{ String structId = null; Token structInstanceId, constToken = null;
+    java.util.Set<VariableDeclarationStatement> definitions;}
+{
+
+    structId = type() structInstanceId = <ID> <ASSIGN> <LBRACE>
+         definitions = structMemberDefinitions()
+     <RBRACE> <SEMI>
+
+    { return new GlobalStructDefinition(structId, structInstanceId.image, definitions, constToken); }
+
+}
+
+AbstractGlobalScopeUnit globalStructAssigment() :
+{ Token structInstanceId, constToken = null; java.util.Set<VariableDeclarationStatement> definitions; }
+{
+     structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new GlobalStructAssigment(structInstanceId.image, definitions, constToken); }
 }
 
 java.util.Set structMemberDeclarations() :
 {
     java.util.Set<VariableDeclarationStatement> structMemberDeclarations;
     structMemberDeclarations = new java.util.HashSet();
-    String type; Token t;
+    String type; Token t; Expression expression = null;
 }
 {
 	type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
-	{ structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
+	{ structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, expression)); }
 
 	(
 	 type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
-	 { structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
+	 { structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, expression)); }
+	)*
+
+	{ return structMemberDeclarations; }
+
+}
+
+java.util.Set structMemberDefinitions() :
+{
+    java.util.Set<VariableDeclarationStatement> structMemberDeclarations;
+    structMemberDeclarations = new java.util.HashSet();
+    Token t; Expression expression = null;
+}
+{
+	 t = <ID> (<ASSIGN> expression = simpleInitializer())?
+	{ structMemberDeclarations.add(new VariableDeclarationStatement(null, t.image, expression)); }
+
+	( <COMMA>
+	 t = <ID> (<ASSIGN> expression = simpleInitializer())?
+	 { structMemberDeclarations.add(new VariableDeclarationStatement(null, t.image, expression)); }
 	)*
 
 	{ return structMemberDeclarations; }
@@ -207,7 +248,7 @@ java.util.Set structMemberDeclarations() :
 AbstractGlobalScopeUnit globalDeclaration() :
 { AbstractGlobalScopeUnit globalVariable =  null; }
 {
-      LOOKAHEAD(5)
+      LOOKAHEAD(2)
 	  globalVariable = globalStructAssigment()
 	 { return globalVariable; }
 
@@ -217,12 +258,6 @@ AbstractGlobalScopeUnit globalDeclaration() :
 
 }
 
-AbstractGlobalScopeUnit globalStructAssigment() :
-{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions; }
-{
-     id = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new GlobalStructAssigment(id.image, definitions, constToken); }
-}
 
 AbstractGlobalScopeUnit globalVariableDeclaration() :
 { String type; Token id, constToken = null; Expression value = null;}
@@ -341,6 +376,7 @@ Statement variableDeclarationStatement() :
 {
   String type,constToken = null; Token t; Expression valueExp = null;
   java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
+  structMemberDefinitions = new java.util.HashSet();
 }
 {
     LOOKAHEAD(2)
@@ -352,15 +388,15 @@ Statement variableDeclarationStatement() :
 
 	(<CONST>)? type = type() t = <ID> (<ASSIGN> <LBRACE> structMemberDefinitions = structMemberDeclarations() )? <RBRACE> <SEMI>
 
-    { return new StructDeclarationStatement(type, t.image, structMemberDefinitions, constToken ); }
+    { return new StructDefinitionStatement(type, t.image, structMemberDefinitions, constToken ); }
 }
 
-AbstractGlobalScopeUnit structDeclaration() :
+AbstractGlobalScopeUnit structDeclarationsss() :
 { Token t; java.util.Set<VariableDeclarationStatement> structMemberDeclarations;}
 {
 	<STRUCT> t = <ID> <LBRACE> structMemberDeclarations = structMemberDeclarations() <RBRACE> <SEMI>
 
-	{ return new StructDeclaration(t.image, structMemberDeclarations ); }
+	{ return new StructDeclaration(t.image, structMemberDeclarations, null ); }
 
 }
 
@@ -444,16 +480,9 @@ Statement iterationStatement() :
 	  { return new DoWhileStatement(boolExpression, iterationBody); }
 
 	| <FOR> <LPAREN>
-<<<<<<< HEAD
-                (LOOKAHEAD(2) ( LOOKAHEAD(2) forIndex = statement())? | <SEMI> )
-                boolExpression = expression()  <SEMI>
-                (LOOKAHEAD(2) forIncrement = statement())?
-            <RPAREN>
-=======
                 (LOOKAHEAD(2) forIndex = statement())? <SEMI>
                 (boolExpression = expression())? <SEMI>
                 (forIncrement = assignmentStatement())? <RPAREN>
->>>>>>> parent of ab6069f... --amend
                 iterationBody = statement()
       { return new ForStatement(boolExpression, iterationBody, forIndex, forIncrement ); }
 }

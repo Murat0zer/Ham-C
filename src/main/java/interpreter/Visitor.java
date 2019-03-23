@@ -43,12 +43,6 @@ public interface Visitor {
 
     void visit(GlobalVariableDeclaration globalVariableDeclaration);
 
-    void visit(GlobalStructDeclaration globalStructDeclaration);
-
-    void visit(StructDeclaration structDeclaration);
-
-    void visit(StructMemberDeclaration structMemberDeclaration);
-
     void visit(FunctionDeclaration functionDeclaration);
 
     void visit (StructInitializer structInitializer);
@@ -135,10 +129,16 @@ public interface Visitor {
 
     Object visit(ForStatement statement);
 
-    Object visit(StructDeclarationStatement structDeclarationStatement);
+    Object visit(StructDefinitionStatement structDefinitionStatement);
 
     Object visit(StructAssignmentStatement structAssignmentStatement);
 
-    Object visit(GlobalStructAssigment globalStructAssigment);
+    void visit(GlobalStructAssigment globalStructAssigment);
+
+    void visit(GlobalStructDefinition globalStructDefinition);
+
+    void visit(StructDeclaration structDeclaration);
+
+    void visit(StructMemberDeclaration structMemberDeclaration);
 
 }

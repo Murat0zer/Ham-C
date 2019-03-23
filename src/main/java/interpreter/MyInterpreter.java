@@ -2,14 +2,12 @@ package interpreter;
 
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import javacc.Parser;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 public class MyInterpreter {

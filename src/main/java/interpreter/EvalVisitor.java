@@ -30,6 +30,8 @@ import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 class EvalVisitor implements Visitor {
 
@@ -55,40 +57,50 @@ class EvalVisitor implements Visitor {
     }
 
     public void visit(StructDeclaration structDeclaration) {
-        Map<String, Object> structVariables = new HashMap<>();
-        String structId = structDeclaration.getId();
-        structDeclaration.getStructMemberDeclarations().forEach(variableDeclarationStatement -> {
+        Map<String, Object> structDefaultVariables = new HashMap<>();
+        String structId = structDeclaration.getStructId();
+        structDeclaration.getStatements().forEach(variableDeclarationStatement -> {
             Object value = variableDeclarationStatement.getValueExp().accept(this);
             String variableId = variableDeclarationStatement.getId();
-            structVariables.put(variableId, value);
+            structDefaultVariables.put(variableId, value);
         });
-        table.addStructDefinition(structId, structVariables);    }
-
-    public void visit(StructInitializer structInitializer) {
-        ExpressionList  expressionList = (ExpressionList) structInitializer.getExpressions();
-        expressionList.getE1().accept(this);
-        if(expressionList.getE2() != null)
-            expressionList.getE2().accept(this);
-
+        table.addStructDeclaration(structId, structDefaultVariables);
     }
 
-    public void visit(GlobalStructDeclaration globalStructDeclaration) {
+
+    public void visit(GlobalStructDefinition globalStructDefinition) {
 
         table.beginScope();
         Map<String, Object> structVariables = new HashMap<>();
-        String structId = globalStructDeclaration.getId();
-        globalStructDeclaration.getStatements().forEach(variableDeclarationStatement -> {
+        String structId = globalStructDefinition.getStructId();
+
+        globalStructDefinition.getStatements()
+            .forEach(variableDeclarationStatement -> {
+
             Object value = variableDeclarationStatement.getValueExp().accept(this);
             String variableId = variableDeclarationStatement.getId();
             structVariables.put(variableId, value);
         });
-        table.addStructDefinition(structId, structVariables);
+
+        Map<String, Object> structDefaultVars;
+
+        structDefaultVars = table.getStructDeclaration(structId);
+
+        Map<String, Object> defaultValuesMap;
+
+        defaultValuesMap = structDefaultVars.entrySet()
+            .stream()
+            .filter(stringObjectEntry -> structVariables.keySet().contains(stringObjectEntry.getKey()))
+            .collect(Collectors.toMap(Object::toString, o -> o ));
+
+        structDefaultVars.putAll(defaultValuesMap);
+        table.assignStruct(structId, structVariables);
     }
 
     @Override
-    public Object visit(GlobalStructAssigment globalStructAssigment) {
+    public void visit(GlobalStructAssigment globalStructAssigment) {
 
-        String structId = globalStructAssigment.getId();
+        String structId = globalStructAssigment.getStructInstanceId();
 
         Map<String, Object>  assignedStructValues = new HashMap<>();
 
@@ -100,11 +112,10 @@ class EvalVisitor implements Visitor {
         });
 
         table.assignStruct(structId, assignedStructValues);
-        return null;
     }
 
     @Override
-    public Object visit(StructDeclarationStatement structDeclarationStatement) {
+    public Object visit(StructDefinitionStatement structDefinitionStatement) {
         return null;
     }
 
@@ -113,6 +124,13 @@ class EvalVisitor implements Visitor {
         return null;
     }
 
+    public void visit(StructInitializer structInitializer) {
+        ExpressionList  expressionList = (ExpressionList) structInitializer.getExpressions();
+        expressionList.getE1().accept(this);
+        if(expressionList.getE2() != null)
+            expressionList.getE2().accept(this);
+
+    }
 
     public void visit(GlobalVariableDeclaration globalVariableDeclaration) {
         if (table.fp == -1)

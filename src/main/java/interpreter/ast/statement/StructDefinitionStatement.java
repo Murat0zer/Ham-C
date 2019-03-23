@@ -1,7 +1,6 @@
 package interpreter.ast.statement;
 
 import interpreter.Visitor;
-import interpreter.ast.expression.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StructDeclarationStatement extends Statement {
+public class StructDefinitionStatement extends Statement {
 
   private String type;
   private String id;
