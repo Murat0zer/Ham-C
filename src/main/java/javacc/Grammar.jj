@@ -200,11 +200,11 @@ AbstractGlobalScopeUnit globalStructDefinition() :
 
 }
 
-AbstractGlobalScopeUnit globalStructAssigment() :
-{ Token structInstanceId, constToken = null; java.util.Set<VariableDeclarationStatement> definitions; }
+AbstractGlobalScopeUnit globalStructAssignment() :
+{ Token structInstanceId, constToken = null; java.util.Set<AssignmentStatement> definitions; }
 {
-     structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new GlobalStructAssigment(structInstanceId.image, definitions, constToken); }
+     structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structInitializer() <RBRACE> <SEMI>
+    { return new GlobalStructAssignment(structInstanceId.image, definitions, constToken); }
 }
 
 java.util.Set structMemberDeclarations() :
@@ -249,7 +249,7 @@ AbstractGlobalScopeUnit globalDeclaration() :
 { AbstractGlobalScopeUnit globalVariable =  null; }
 {
       LOOKAHEAD(2)
-	  globalVariable = globalStructAssigment()
+	  globalVariable = globalStructAssignment()
 	 { return globalVariable; }
 
     |
@@ -271,17 +271,26 @@ Expression initializer() :
 { Expression expression; }
 {
 	expression = simpleInitializer() { return new SimpleInitializer(expression); }
-	| <LBRACE> expression = structInitializer() <RBRACE>
-	  { return new SimpleInitializer(new StructInitializer(expression)); }
 
 }
 
-Expression structInitializer() :
-{ Expression expression; Expression expression2 = null; }
+java.util.Set structInitializer() :
 {
-	expression = simpleInitializer() ( LOOKAHEAD(2) <COMMA>  expression2 = structInitializer())*
+    java.util.Set<AssignmentStatement> structAssignments;
+    structAssignments = new java.util.HashSet();
+    String type; Token t; Statement statement = null;
+}
+{
+	 statement = structVariableInitializeStatement()
+    { structAssignments.add((AssignmentStatement) statement); }
 
-	{ return new ExpressionList(expression, expression2); }
+    (
+        LOOKAHEAD(2)
+        <COMMA>
+        statement = structVariableInitializeStatement()
+        { structAssignments.add((AssignmentStatement) statement); }
+    )*
+    { return structAssignments; }
 }
 
 Expression simpleInitializer() :
@@ -325,6 +334,12 @@ Statement statementList() :
 Statement statement() :
 {Statement stm;}
 {
+      LOOKAHEAD(2)
+      stm = structDefinitionStatement() { return stm; }
+    |
+      LOOKAHEAD(2)
+      stm = structAssignmentStatement() { return stm; }
+    |
 	  LOOKAHEAD(2)
       stm = variableDeclarationStatement() { return stm; }
 	| stm = expressionOrAssignmentStatement() { return stm; }
@@ -346,7 +361,7 @@ Statement expressionOrAssignmentStatement() :
 }
 
 Statement assignmentStatement() :
-{ Expression expression; Token t; java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
+{ Expression expression; Token t;  Expression pfExp;
 }
 {
     LOOKAHEAD(2)
@@ -355,10 +370,26 @@ Statement assignmentStatement() :
 	{ return new AssignmentStatement(expression, t.image); }
 
 	|
+    LOOKAHEAD(3)
+	pfExp = postfixExpression() <ASSIGN>  expression = expression() <SEMI>
+    {return new StructVariableAssignmentStatement(pfExp, expression); }
 
-	t = <ID> <ASSIGN> <LBRACE> structMemberDefinitions = structMemberDeclarations() <RBRACE> <SEMI>
 
-    { return new StructAssignmentStatement(t.image, structMemberDefinitions); }
+}
+
+Statement structAssignmentStatement() :
+{ Token structInstanceId; String constToken = null; java.util.Set<AssignmentStatement> definitions; }
+{
+     structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structInitializer() <RBRACE> <SEMI>
+    { return new StructAssignmentStatement(structInstanceId.image, definitions, constToken); }
+}
+
+Statement structVariableInitializeStatement() :
+{ Expression expression; Token t;  Expression pfExp;
+}
+{    t = <ID> <ASSIGN> expression = expression()
+
+     { return new AssignmentStatement(expression, t.image); }
 }
 
 
@@ -370,25 +401,30 @@ Statement expressionStatement() :
 }
 
 
-
-
 Statement variableDeclarationStatement() :
 {
   String type,constToken = null; Token t; Expression valueExp = null;
-  java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
-  structMemberDefinitions = new java.util.HashSet();
+
 }
 {
-    LOOKAHEAD(2)
 	(<CONST>)? type = type() t = <ID> (<ASSIGN> valueExp = expression())? <SEMI>
 
 	{ return new VariableDeclarationStatement(type, t.image, valueExp); }
+}
+Statement structDefinitionStatement() :
+{
+    java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
+    structMemberDefinitions = new java.util.HashSet();
+    String structId = null; Token structInstanceId; String constToken = null;
 
-	|
+}
+{
+     structId = type() structInstanceId = <ID> <ASSIGN> <LBRACE>
+         structMemberDefinitions = structMemberDefinitions()
+     <RBRACE> <SEMI>
 
-	(<CONST>)? type = type() t = <ID> (<ASSIGN> <LBRACE> structMemberDefinitions = structMemberDeclarations() )? <RBRACE> <SEMI>
+     { return new StructDefinitionStatement(structId, structInstanceId.image, structMemberDefinitions, constToken ); }
 
-    { return new StructDefinitionStatement(type, t.image, structMemberDefinitions, constToken ); }
 }
 
 AbstractGlobalScopeUnit structDeclarationsss() :
@@ -578,7 +614,7 @@ Expression additiveExpression() :
 {
 	e1 = multiplicativeExpression()
 	(
-
+        LOOKAHEAD(2)
 	    (
 	        <PLUS> e2 = multiplicativeExpression() { e1 = new PlusExpression(e1, e2); } |
 	        <MINUS> e2 = multiplicativeExpression() { e1 = new MinusExpression(e1, e2); }
@@ -634,7 +670,6 @@ Expression primaryExpression() :
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
 	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
 	 | t = <ID>  { return new IdExpression(t.image); }
-
 }
 
 Expression primaryExpressionPrime() :

@@ -133,12 +133,14 @@ public interface Visitor {
 
     Object visit(StructAssignmentStatement structAssignmentStatement);
 
-    void visit(GlobalStructAssigment globalStructAssigment);
+    void visit(GlobalStructAssignment globalStructAssignment);
 
     void visit(GlobalStructDefinition globalStructDefinition);
 
     void visit(StructDeclaration structDeclaration);
 
     void visit(StructMemberDeclaration structMemberDeclaration);
+
+    Object visit(StructVariableAssignmentStatement structVariableAssignmentStatement);
 
 }

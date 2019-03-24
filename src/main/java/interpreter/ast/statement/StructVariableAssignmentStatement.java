@@ -4,17 +4,15 @@ import interpreter.Visitor;
 import interpreter.ast.expression.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class AssignmentStatement extends Statement {
+public class StructVariableAssignmentStatement extends Statement {
 
-    private Expression valueExp;
-    private String id;
+    private Expression postfixExpression;
+    private Expression value;
 
     @Override
     public Object accept(Visitor v) {

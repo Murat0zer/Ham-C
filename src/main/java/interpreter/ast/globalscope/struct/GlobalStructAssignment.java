@@ -2,7 +2,7 @@ package interpreter.ast.globalscope.struct;
 
 import interpreter.Visitor;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
-import interpreter.ast.statement.VariableDeclarationStatement;
+import interpreter.ast.statement.AssignmentStatement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +14,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GlobalStructAssigment extends AbstractGlobalScopeUnit {
+public class GlobalStructAssignment extends AbstractGlobalScopeUnit {
 
   private String structInstanceId;
-  private Set<VariableDeclarationStatement> statements;
+  private Set<AssignmentStatement> statements;
   private Object constToken;
 
   @Override

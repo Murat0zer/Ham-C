@@ -14,8 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class StructDefinitionStatement extends Statement {
 
-  private String type;
-  private String id;
+  private String structId;
+  private String structInstanceId;
   private Set<VariableDeclarationStatement> statements;
   private Object constToken;
 

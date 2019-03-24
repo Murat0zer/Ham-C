@@ -20,6 +20,8 @@ public class Table {
 
     public void beginScope() {
         table[++fp] = new Hashtable();
+        structInstancesTable[fp] = new Hashtable();
+
     }
 
     public void endScope() {
@@ -35,19 +37,25 @@ public class Table {
     }
 
     public void addStructDeclaration(String structId, Map<String, Object> structVariables) {
+        if(structDeclarationsTable[fp] == null)
+            structDeclarationsTable[fp] = new Hashtable();
         structDeclarationsTable[fp].put(structId, structVariables);
     }
 
     public Map<String, Object> getStructDeclaration(String structId) {
-        return ((Map<String, Object>) structDeclarationsTable[fp].get(structId));
+        return ((Map<String, Object>) structDeclarationsTable[0].get(structId));
+    }
+
+    public Map<String, Object> getStructInstance(String structInstanceId) {
+        return ((Map<String, Object>) structInstancesTable[fp].get(structInstanceId));
     }
 
     public void assignStruct(String structInstanceId, Map<String, Object> structVariables) {
-        structDeclarationsTable[fp].put(structInstanceId, structVariables);
+        structInstancesTable[fp].put(structInstanceId, structVariables);
     }
 
-    public Object getStructVariable(String structId, String variableId) {
-        return ((Map<String, Object>)structInstancesTable[fp].get(structId)).get(variableId);
+    public Object getStructVariable(String structInstanceId, String variableId) {
+        return ((Map<String, Object>)structInstancesTable[fp].get(structInstanceId)).get(variableId);
     }
 
     public void setStructVariable(String structInstanceId, String variableId, Object value) {
