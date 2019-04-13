@@ -146,9 +146,7 @@ AbstractGlobalScopeUnit functionDeclaration() :
 String returnType() :
 { Token t; String returnType; }
 {
-	t = <VOID> { return t.image; } | returnType = type()
-
-	{ return returnType; }
+	t = <VOID> { return t.image; } | returnType = type() { return returnType; }
 }
 
 String type() :
@@ -179,11 +177,11 @@ java.util.List formalList() :
 
 
 AbstractGlobalScopeUnit structDeclaration() :
-{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions;}
+{ Token id; java.util.Set<VariableDeclarationStatement> definitions;}
 {
 
     <STRUCT> id = <ID>  <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new StructDeclaration(id.image, definitions, constToken); }
+    { return new StructDeclaration(id.image, definitions); }
 
 }
 
@@ -424,15 +422,6 @@ Statement structDefinitionStatement() :
      <RBRACE> <SEMI>
 
      { return new StructDefinitionStatement(structId, structInstanceId.image, structMemberDefinitions, constToken ); }
-
-}
-
-AbstractGlobalScopeUnit structDeclarationsss() :
-{ Token t; java.util.Set<VariableDeclarationStatement> structMemberDeclarations;}
-{
-	<STRUCT> t = <ID> <LBRACE> structMemberDeclarations = structMemberDeclarations() <RBRACE> <SEMI>
-
-	{ return new StructDeclaration(t.image, structMemberDeclarations, null ); }
 
 }
 

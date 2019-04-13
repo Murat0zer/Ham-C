@@ -64,7 +64,7 @@ class EvalVisitor implements Visitor {
             table.beginScope();
 
         Map<String, Object> structDefaultVariables;
-        structDefaultVariables = util.getVariableDeclarationMap(structDeclaration.getStatements(), this);
+        structDefaultVariables = util.getVariableDeclarationMap(structDeclaration.getMemberDeclarations(), this);
         String structId = structDeclaration.getStructId();
         table.addStructDeclaration(structId, structDefaultVariables);
     }
