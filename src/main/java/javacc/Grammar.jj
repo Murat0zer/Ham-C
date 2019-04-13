@@ -1,5 +1,5 @@
 options {
-	DEBUG_PARSER = true;
+	DEBUG_PARSER = false;
 }
 
 
@@ -114,25 +114,14 @@ java.util.List start() :
 }
 {
   (
-     abstractGlobalScopeUnit =  globalScopeUnit()
-     { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); }
-
+     LOOKAHEAD(3)
+     abstractGlobalScopeUnit = structDeclaration()  { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); } |
+     abstractGlobalScopeUnit = globalStructDefinition()  { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); } |
+     abstractGlobalScopeUnit = globalDeclaration()  { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); } |
+     abstractGlobalScopeUnit = functionDeclaration()  { abstractGlobalScopeUnits.add(abstractGlobalScopeUnit); }
   )+
    <EOF>
    { return abstractGlobalScopeUnits; }
-}
-
-AbstractGlobalScopeUnit globalScopeUnit() :
-{ AbstractGlobalScopeUnit globalScopeUnit; }
-{
-
-        LOOKAHEAD(3)
-        globalScopeUnit = structDeclaration()  { return globalScopeUnit; } |
-        LOOKAHEAD(3)
-        globalScopeUnit = globalStructDefinition() { return globalScopeUnit; } |
-        LOOKAHEAD(3)
-        globalScopeUnit = globalDeclaration() { return globalScopeUnit; } |
-        globalScopeUnit = functionDeclaration() { return globalScopeUnit; }
 }
 
 AbstractGlobalScopeUnit functionDeclaration() :
