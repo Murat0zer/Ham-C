@@ -209,7 +209,7 @@ java.util.Set structMemberDeclarations() :
     String type; Token t;
 }
 {
-	type = type() t = <ID> (<ASSIGN> <SEMI>
+	type = type() t = <ID> <SEMI>
 	{ memberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
 
 	(
