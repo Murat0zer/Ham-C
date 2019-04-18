@@ -125,11 +125,11 @@ java.util.List start() :
 }
 
 AbstractGlobalScopeUnit functionDeclaration() :
-{ Token t; java.util.List parameterList; Statement body; String returnType; }
+{ Token t; String returnType; java.util.List parameterList; Statement body; }
 {
 	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> body = compoundStatement()
 
-    { return new FunctionDeclaration(returnType, t.image, parameterList, body );  }
+    { return new FunctionDeclaration(returnType, t.image, parameterList, body);  }
 }
 
 String returnType() :
@@ -141,7 +141,6 @@ String returnType() :
 String type() :
 { Token t; }
 {
-    LOOKAHEAD(2)
 	    t = <INT> { return t.image; }
 	|   t = <DOUBLE> { return t.image; }
 	|   t = <BOOL> { return t.image; }
@@ -159,21 +158,25 @@ java.util.List parameterList() :
 java.util.List formalList() :
 { Token t; String type; java.util.List<Variable> parameterList = new java.util.ArrayList(); }
 {
-	(<COMMA> (<CONST>)? type = type() t = <ID> { parameterList.add(new Variable(type, t.image)); })*
 
-		{ return parameterList; }
+    ( (<CONST>)? type = type() t = <ID> ) { parameterList.add(new Variable(type, t.image)); } // const olup olmama dikkate alinmiyor duzeltilecek.
+
+	( <COMMA> (<CONST>)? type = type() t = <ID> { parameterList.add(new Variable(type, t.image)); } )*
+
+	{ return parameterList; }
 }
 
 
 AbstractGlobalScopeUnit structDeclaration() :
-{ Token id; java.util.Set<VariableDeclarationStatement> definitions;}
+{ Token t; java.util.Set<VariableDeclarationStatement> memberDeclarations;}
 {
 
-    <STRUCT> id = <ID>  <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new StructDeclaration(id.image, definitions); }
+    <STRUCT> t = <ID>  <LBRACE> memberDeclarations = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new StructDeclaration(t.image, memberDeclarations); }
 
 }
 
+/* BURASI KALDIRILACAK1
 AbstractGlobalScopeUnit globalStructDefinition() :
 { String structId = null; Token structInstanceId, constToken = null;
     java.util.Set<VariableDeclarationStatement> definitions;}
@@ -187,6 +190,9 @@ AbstractGlobalScopeUnit globalStructDefinition() :
 
 }
 
+*/
+
+/* BURASI OLMAYACAK
 AbstractGlobalScopeUnit globalStructAssignment() :
 { Token structInstanceId, constToken = null; java.util.Set<AssignmentStatement> definitions; }
 {
@@ -194,22 +200,24 @@ AbstractGlobalScopeUnit globalStructAssignment() :
     { return new GlobalStructAssignment(structInstanceId.image, definitions, constToken); }
 }
 
+*/
+
 java.util.Set structMemberDeclarations() :
 {
-    java.util.Set<VariableDeclarationStatement> structMemberDeclarations;
-    structMemberDeclarations = new java.util.HashSet();
-    String type; Token t; Expression expression = null;
+    java.util.Set<VariableDeclarationStatement> memberDeclarations;
+    memberDeclarations = new java.util.HashSet();
+    String type; Token t;
 }
 {
-	type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
-	{ structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, expression)); }
+	type = type() t = <ID> (<ASSIGN> <SEMI>
+	{ memberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
 
 	(
-	 type = type() t = <ID> (<ASSIGN> expression = simpleInitializer())? <SEMI>
-	 { structMemberDeclarations.add(new VariableDeclarationStatement(type, t.image, expression)); }
+	 type = type() t = <ID> <SEMI>
+	 { memberDeclarations.add(new VariableDeclarationStatement(type, t.image, null)); }
 	)*
 
-	{ return structMemberDeclarations; }
+	{ return memberDeclarations; }
 
 }
 
@@ -249,7 +257,7 @@ AbstractGlobalScopeUnit globalDeclaration() :
 AbstractGlobalScopeUnit globalVariableDeclaration() :
 { String type; Token id, constToken = null; Expression value = null;}
 {
-    (constToken = <CONST> )* type = type() id = <ID> ( <ASSIGN> value = initializer() )* <SEMI>
+    (constToken = <CONST> )? type = type() id = <ID> <ASSIGN> value = initializer() <SEMI>
     { return new GlobalVariableDeclaration(type, id.image, value, constToken); }
 
 }
@@ -281,18 +289,18 @@ java.util.Set structInitializer() :
 }
 
 Expression simpleInitializer() :
-{ Token t;}
+{ Token t; }
 {
 	t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }     |
 	t = <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
-	    <TRUE> { return new BoolExpression(true); } |
-	    <FALSE> { return new BoolExpression(false); }|
-    t = <STRCONST> { return new StrConst(t.image); }
+	t = <STRCONST> { return new StrConst(t.image); }    |
+	<TRUE> { return new BoolExpression(true); } |
+	<FALSE> { return new BoolExpression(false); }
 }
 
 
 Statement compoundStatement() :
-{Statement s1,s2;}
+{ Statement s1, s2; }
 {
 	<LBRACE>
 	    s1 = statementList()
@@ -303,7 +311,7 @@ Statement compoundStatement() :
 }
 
 Statement statementList() :
-{Statement statement, statementList; }
+{ Statement statement, statementList; }
 {
 	(
 	    LOOKAHEAD(2)

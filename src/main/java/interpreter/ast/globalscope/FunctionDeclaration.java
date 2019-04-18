@@ -9,16 +9,16 @@ import lombok.Setter;
 @Setter
 public class FunctionDeclaration extends AbstractGlobalScopeUnit {
 
+    private String returnType;
     private String id;
     private java.util.List parameterList;
     private Statement statementList;
-    private String returnType;
 
     public FunctionDeclaration(String returnType, String id, java.util.List parameterList, Statement statementList) {
+        this.returnType = returnType;
         this.id = id;
         this.parameterList = parameterList;
         this.statementList = statementList;
-        this.returnType = returnType;
     }
 
     public void accept(Visitor v) {
