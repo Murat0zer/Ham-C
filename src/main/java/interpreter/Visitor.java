@@ -28,6 +28,10 @@ import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
+import interpreter.ast.statement.struct.StructAssignmentStatement;
+import interpreter.ast.statement.struct.StructDeclarationStatement;
+import interpreter.ast.statement.struct.StructDefinitionStatement;
+import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
 
 public interface Visitor {
 
@@ -129,18 +133,19 @@ public interface Visitor {
 
     Object visit(ForStatement statement);
 
-    Object visit(StructDefinitionStatement structDefinitionStatement);
+    Object visit(StructDeclarationStatement structDefinitionStatement);
 
     Object visit(StructAssignmentStatement structAssignmentStatement);
 
     void visit(GlobalStructAssignment globalStructAssignment);
 
-    void visit(GlobalStructDefinition globalStructDefinition);
+    void visit(GlobalStructDeclaration globalStructDeclaration);
 
-    void visit(StructDeclaration structDeclaration);
+    void visit(GlobalStructDefinition globalStructDefinition);
 
     void visit(StructMemberDeclaration structMemberDeclaration);
 
     Object visit(StructVariableAssignmentStatement structVariableAssignmentStatement);
 
+    Object visit(StructDefinitionStatement structDefinitionStatement);
 }

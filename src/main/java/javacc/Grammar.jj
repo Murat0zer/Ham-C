@@ -16,6 +16,7 @@ import interpreter.ast.expression.relational.*;
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
+import interpreter.ast.statement.struct.*;
 import interpreter.ast.statement.*;
 public class Parser {
 	public static void main(String args[]) throws ParseException {
@@ -127,9 +128,9 @@ AbstractGlobalScopeUnit globalScopeUnit() :
 {
 
         LOOKAHEAD(3)
-        globalScopeUnit = structDeclaration()  { return globalScopeUnit; } |
+        globalScopeUnit = globalStructDefinition()  { return globalScopeUnit; } |
         LOOKAHEAD(3)
-        globalScopeUnit = globalStructDefinition() { return globalScopeUnit; } |
+        globalScopeUnit = globalStructDeclaration() { return globalScopeUnit; } |
         LOOKAHEAD(3)
         globalScopeUnit = globalDeclaration() { return globalScopeUnit; } |
         globalScopeUnit = functionDeclaration() { return globalScopeUnit; }
@@ -178,25 +179,25 @@ java.util.List formalList() :
 }
 
 
-AbstractGlobalScopeUnit structDeclaration() :
-{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> definitions;}
+AbstractGlobalScopeUnit globalStructDefinition() :
+{ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> declarations;}
 {
 
-    <STRUCT> id = <ID>  <LBRACE> definitions = structMemberDeclarations() <RBRACE> <SEMI>
-    { return new StructDeclaration(id.image, definitions, constToken); }
+    <STRUCT> id = <ID>  <LBRACE> declarations = structMemberDeclarations() <RBRACE> <SEMI>
+    { return new GlobalStructDefinition(id.image, declarations, constToken); }
 
 }
 
-AbstractGlobalScopeUnit globalStructDefinition() :
-{ String structId = null; Token structInstanceId, constToken = null;
+AbstractGlobalScopeUnit globalStructDeclaration() :
+{ Token structId = null; Token structInstanceId, constToken = null;
     java.util.Set<VariableDeclarationStatement> definitions;}
 {
 
-    structId = type() structInstanceId = <ID> <ASSIGN> <LBRACE>
+    structId = <ID> structInstanceId = <ID> <ASSIGN> <LBRACE>
          definitions = structMemberDefinitions()
      <RBRACE> <SEMI>
 
-    { return new GlobalStructDefinition(structId, structInstanceId.image, definitions, constToken); }
+    { return new GlobalStructDeclaration(structId.image, structInstanceId.image, definitions, constToken); }
 
 }
 
@@ -338,6 +339,9 @@ Statement statement() :
       stm = structDefinitionStatement() { return stm; }
     |
       LOOKAHEAD(2)
+      stm = structDeclarationStatement() { return stm; }
+    |
+      LOOKAHEAD(2)
       stm = structAssignmentStatement() { return stm; }
     |
 	  LOOKAHEAD(2)
@@ -381,7 +385,7 @@ Statement structAssignmentStatement() :
 { Token structInstanceId; String constToken = null; java.util.Set<AssignmentStatement> definitions; }
 {
      structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structInitializer() <RBRACE> <SEMI>
-    { return new StructAssignmentStatement(structInstanceId.image, definitions, constToken); }
+    { return new interpreter.ast.statement.struct.StructAssignmentStatement(structInstanceId.image, definitions, constToken); }
 }
 
 Statement structVariableInitializeStatement() :
@@ -411,31 +415,31 @@ Statement variableDeclarationStatement() :
 
 	{ return new VariableDeclarationStatement(type, t.image, valueExp); }
 }
-Statement structDefinitionStatement() :
+
+Statement structDeclarationStatement() :
 {
     java.util.Set<VariableDeclarationStatement> structMemberDefinitions;
     structMemberDefinitions = new java.util.HashSet();
-    String structId = null; Token structInstanceId; String constToken = null;
+    Token structId = null; Token structInstanceId; String constToken = null;
 
 }
 {
-     structId = type() structInstanceId = <ID> <ASSIGN> <LBRACE>
+     structId = <ID> structInstanceId = <ID> <ASSIGN> <LBRACE>
          structMemberDefinitions = structMemberDefinitions()
      <RBRACE> <SEMI>
 
-     { return new StructDefinitionStatement(structId, structInstanceId.image, structMemberDefinitions, constToken ); }
+     { return new StructDeclarationStatement(structId.image, structInstanceId.image, structMemberDefinitions, constToken ); }
 
 }
 
-AbstractGlobalScopeUnit structDeclarationsss() :
-{ Token t; java.util.Set<VariableDeclarationStatement> structMemberDeclarations;}
+Statement structDefinitionStatement() :
 {
-	<STRUCT> t = <ID> <LBRACE> structMemberDeclarations = structMemberDeclarations() <RBRACE> <SEMI>
-
-	{ return new StructDeclaration(t.image, structMemberDeclarations, null ); }
-
+ Token id, constToken = null; java.util.Set<VariableDeclarationStatement> declarations;
 }
-
+{
+    <STRUCT> id = <ID>  <LBRACE> declarations = structMemberDeclarations() <RBRACE> <SEMI>
+        { return new StructDefinitionStatement(id.image, declarations, constToken); }
+}
 
 Statement selectionStatement() :
 { Statement statement; }

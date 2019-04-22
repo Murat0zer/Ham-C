@@ -11,6 +11,7 @@ import interpreter.ast.expression.relational.*;
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
+import interpreter.ast.statement.struct.*;
 import interpreter.ast.statement.*;
 
 /** Token Manager. */

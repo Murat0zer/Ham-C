@@ -28,6 +28,10 @@ import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
+import interpreter.ast.statement.struct.StructAssignmentStatement;
+import interpreter.ast.statement.struct.StructDeclarationStatement;
+import interpreter.ast.statement.struct.StructDefinitionStatement;
+import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -36,10 +40,10 @@ import java.util.Objects;
 @Slf4j
 class EvalVisitor implements Visitor {
 
-    boolean brk = false;
-    boolean cnt = false;
-    Table table = new Table(1000);
-    Util util = new Util();
+    private boolean brk = false;
+    private boolean cnt = false;
+    private Table table = new Table(1000);
+    private Util util = new Util();
 
 
     public void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit) {
@@ -59,32 +63,35 @@ class EvalVisitor implements Visitor {
 
     }
 
-    public void visit(StructDeclaration structDeclaration) {
+    public void visit(GlobalStructDefinition globalStructDefinition) {
         if (table.fp == -1)
             table.beginScope();
 
         Map<String, Object> structDefaultVariables;
-        structDefaultVariables = util.getVariableDeclarationMap(structDeclaration.getStatements(), this);
-        String structId = structDeclaration.getStructId();
-        table.addStructDeclaration(structId, structDefaultVariables);
+        structDefaultVariables = util.getVariableDeclarationMap(globalStructDefinition.getStatements(), this);
+        String structId = globalStructDefinition.getStructId();
+        table.addStructDefinition(structId, structDefaultVariables);
     }
 
 
-    public void visit(GlobalStructDefinition globalStructDefinition) {
+    public void visit(GlobalStructDeclaration globalStructDeclaration) {
 
-        String structId = globalStructDefinition.getStructId();
-        String structInstanceId = globalStructDefinition.getStructInstanceId();
+        String structId = globalStructDeclaration.getStructId();
+        String structInstanceId = globalStructDeclaration.getStructInstanceId();
 
         Map<String, Object> newStructVariables;
-        newStructVariables = util.getVariableDeclarationMap(globalStructDefinition.getStatements(), this);
+        newStructVariables = util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), this);
 
         Map<String, Object> defaultStructVariables;
-        defaultStructVariables = table.getStructDeclaration(structId);
+        int tempFp = table.fp;
+        Util.setScopeForStructDefinition(structId, table);
+        defaultStructVariables = table.getStructDefinition(structId);
+        table.fp = tempFp;
 
-        Map<String, Object> unassignedDefaultVariables;
+        Map<String, Object> unChangedDefaultVariables;
 
-        unassignedDefaultVariables = Util.determineUnassignedFor(defaultStructVariables, newStructVariables);
-        newStructVariables.putAll(unassignedDefaultVariables);
+        unChangedDefaultVariables = Util.determineUnChangedStructVariablesFor(defaultStructVariables, newStructVariables);
+        newStructVariables.putAll(unChangedDefaultVariables);
 
         table.assignStruct(structInstanceId, newStructVariables);
     }
@@ -110,19 +117,18 @@ class EvalVisitor implements Visitor {
 
         String structInstanceId = globalStructAssignment.getStructInstanceId();
 
+        int tempFp = table.fp;
+        Util.setScopeFor(structInstanceId, table);
+
         Map<String, Object> assignedStructValues = util.getVariableDeclarationMap(globalStructAssignment.getStatements(),this);
 
         Map<String, Object> oldStructValues = table.getStructInstance(structInstanceId);
 
-        Map<String, Object> unassignedValues;
+        Map<String, Object> unchangedStructVariables;
 
+        unchangedStructVariables = Util.determineUnChangedStructVariablesFor(oldStructValues, assignedStructValues);
 
-        unassignedValues = Util.determineUnassignedFor(oldStructValues, assignedStructValues);
-
-        int tempFp = table.fp;
-
-        assignedStructValues.putAll(unassignedValues);
-        Util.setScopeFor(structInstanceId, table);
+        assignedStructValues.putAll(unchangedStructVariables);
 
         table.assignStruct(structInstanceId, assignedStructValues);
         table.fp = tempFp;
@@ -140,15 +146,24 @@ class EvalVisitor implements Visitor {
     }
 
     @Override
+    public Object visit(StructDeclarationStatement structDeclarationStatement) {
+
+        GlobalStructDeclaration globalStructDeclaration = new GlobalStructDeclaration();
+
+        globalStructDeclaration.setStatements(structDeclarationStatement.getStatements());
+        globalStructDeclaration.setStructId(structDeclarationStatement.getStructId());
+        globalStructDeclaration.setStructInstanceId(structDeclarationStatement.getStructInstanceId());
+        globalStructDeclaration.setConstToken(structDeclarationStatement.getConstToken());
+        this.visit(globalStructDeclaration);
+        return null;
+    }
+
+    @Override
     public Object visit(StructDefinitionStatement structDefinitionStatement) {
-
-        GlobalStructDefinition globalStructDefinition = new GlobalStructDefinition();
-
-        globalStructDefinition.setStatements(structDefinitionStatement.getStatements());
-        globalStructDefinition.setStructId(structDefinitionStatement.getStructId());
-        globalStructDefinition.setStructInstanceId(structDefinitionStatement.getStructInstanceId());
-        globalStructDefinition.setConstToken(structDefinitionStatement.getConstToken());
-        this.visit(globalStructDefinition);
+        Map<String, Object> structDefaultVariables;
+        structDefaultVariables = util.getVariableDeclarationMap(structDefinitionStatement.getStatements(), this);
+        String structId = structDefinitionStatement.getStructId();
+        table.addStructDefinition(structId, structDefaultVariables);
         return null;
     }
 

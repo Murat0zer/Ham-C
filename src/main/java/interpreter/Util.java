@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Slf4j
 class Util {
 
-
     static int setScopeFor(String structInstanceId, String variableId, Table table) {
 
         Object value = null;
@@ -37,23 +36,32 @@ class Util {
 
     static void setScopeFor(String structInstanceId, Table table) {
 
-        Object value = null;
+        Object value = table.getStructInstance(structInstanceId);
         while (Objects.isNull(value)) {
-            try {
-                value = table.getStructInstance(structInstanceId);
-            } catch (NullPointerException e) {
                 log.trace("Cannot find struct in this scope. Checking higher scopes...");
                 table.fp--;
                 if (table.fp == -1) {
                     log.error("Struct does not exist = {}", structInstanceId);
                     break;
                 }
-            }
-
+            value = table.getStructInstance(structInstanceId);
         }
     }
 
-    static Map<String, Object> determineUnassignedFor(Map<String, Object> oldValues, Map<String, Object> newValues) {
+    public static void setScopeForStructDefinition(String structId, Table table) {
+        Object value = table.getStructDefinition(structId);
+        while (Objects.isNull(value)) {
+            log.trace("Cannot find struct Definition in this scope. Checking higher scopes...");
+            table.fp--;
+            if (table.fp == -1) {
+                log.error("Struct Definition does not exist = {}", structId);
+                break;
+            }
+            value = table.getStructDefinition(structId);
+        }
+    }
+
+    static Map<String, Object> determineUnChangedStructVariablesFor(Map<String, Object> oldValues, Map<String, Object> newValues) {
 
         Predicate<Map.Entry<String, Object>> entryPredicate = s -> !(newValues.keySet().contains(s.getKey()));
         return oldValues
@@ -63,28 +71,29 @@ class Util {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+
+
     <T> Map<String, Object> getVariableDeclarationMap(Set<T> statementSet, Visitor visitor) {
 
         Map<String, Object> variableMap = new HashMap<>();
 
         statementSet.forEach(variableDeclarationStatement -> {
-            Method methodGetValue = null;
-            Method methodGetId = null;
-            String id = null;
 
-            Expression expression = null;
+            Method methodGetValue;
+            Method methodGetId;
+
+            String id;
+            Expression expression;
+
             try {
                 methodGetValue = variableDeclarationStatement.getClass().getDeclaredMethod("getValueExp");
                 methodGetId = variableDeclarationStatement.getClass().getDeclaredMethod("getId");
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-            try {
                 expression = (Expression) methodGetValue.invoke(variableDeclarationStatement);
                 id = (String) methodGetId.invoke(variableDeclarationStatement);
 
-            } catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 log.error(e.getMessage(), e);
+                return;
             }
             Object value = expression.accept(visitor);
             variableMap.put(id, value);

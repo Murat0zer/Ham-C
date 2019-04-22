@@ -1,7 +1,7 @@
-package interpreter.ast.globalscope.struct;
+package interpreter.ast.statement.struct;
 
 import interpreter.Visitor;
-import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.ast.statement.Statement;
 import interpreter.ast.statement.VariableDeclarationStatement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,13 +14,13 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StructDeclaration extends AbstractGlobalScopeUnit {
+public class StructDefinitionStatement extends Statement {
 
     private String structId;
     private Set<VariableDeclarationStatement> statements;
     private Object constToken;
 
-    public void accept(Visitor v) {
-        v.visit(this);
-        }
+    public Object accept(Visitor v) {
+      return  v.visit(this);
+    }
 }

@@ -1,6 +1,8 @@
-package interpreter.ast.statement;
+package interpreter.ast.statement.struct;
 
 import interpreter.Visitor;
+import interpreter.ast.statement.AssignmentStatement;
+import interpreter.ast.statement.Statement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

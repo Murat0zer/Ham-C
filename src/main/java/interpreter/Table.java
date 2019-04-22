@@ -7,13 +7,13 @@ public class Table {
     int fp = -1;
     int size;
     Hashtable[] table;
-    Hashtable[] structDeclarationsTable;
+    Hashtable[] structDefinitionsTable;
     Hashtable[] structInstancesTable;
 
     public Table(int s) {
         size = s;
         table = new Hashtable[s];
-        structDeclarationsTable = new Hashtable[s];
+        structDefinitionsTable = new Hashtable[s];
         structInstancesTable = new Hashtable[s];
 
     }
@@ -36,14 +36,14 @@ public class Table {
         return (table[fp].get(id));
     }
 
-    public void addStructDeclaration(String structId, Map<String, Object> structVariables) {
-        if(structDeclarationsTable[fp] == null)
-            structDeclarationsTable[fp] = new Hashtable();
-        structDeclarationsTable[fp].put(structId, structVariables);
+    public void addStructDefinition(String structId, Map<String, Object> structVariables) {
+        if(structDefinitionsTable[fp] == null)
+            structDefinitionsTable[fp] = new Hashtable();
+        structDefinitionsTable[fp].put(structId, structVariables);
     }
 
-    public Map<String, Object> getStructDeclaration(String structId) {
-        return ((Map<String, Object>) structDeclarationsTable[0].get(structId));
+    public Map<String, Object> getStructDefinition(String structId) {
+        return ((Map<String, Object>) structDefinitionsTable[fp].get(structId));
     }
 
     public Map<String, Object> getStructInstance(String structInstanceId) {
