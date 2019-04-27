@@ -1,13 +1,14 @@
 package interpreter.ast.expression.constant;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ConstantExpression extends Expression {
+public class ConstantExpression implements Expression {
 
     private Expression constantValue;
 
@@ -15,9 +16,7 @@ public class ConstantExpression extends Expression {
         this.constantValue = constantValue;
     }
 
-    public Object accept(Visitor v) {
-
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-
-}
+    }}

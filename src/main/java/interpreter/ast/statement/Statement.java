@@ -1,7 +1,7 @@
 package interpreter.ast.statement;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
 
-public abstract class Statement {
-    public abstract Object accept(Visitor v);
+public interface Statement {
+    Object accept(AbstractVisitor v);
 }

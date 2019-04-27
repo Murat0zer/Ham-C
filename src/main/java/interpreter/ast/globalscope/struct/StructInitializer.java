@@ -1,25 +1,26 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
-import interpreter.ast.expression.ExpressionList;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StructInitializer extends AbstractGlobalScopeUnit {
+public class StructInitializer implements AbstractGlobalScopeUnit {
 
     private Expression expressions;
 
-    public void accept(Visitor v) {
-        v.visit(this);
+    @Override
+    public Object accept(AbstractVisitor v) {
+        ((StructVisitor)v).visit(this);
+        return null;
     }
 }

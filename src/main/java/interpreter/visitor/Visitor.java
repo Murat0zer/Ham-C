@@ -1,7 +1,6 @@
-package interpreter;
+package interpreter.visitor;
 
 import interpreter.ast.CompoundStatement;
-import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
 import interpreter.ast.expression.additive.AdditiveExpression;
 import interpreter.ast.expression.additive.MinusExpression;
@@ -28,12 +27,8 @@ import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
-import interpreter.ast.statement.struct.StructAssignmentStatement;
-import interpreter.ast.statement.struct.StructDeclarationStatement;
-import interpreter.ast.statement.struct.StructDefinitionStatement;
-import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
 
-public interface Visitor {
+public interface Visitor extends AbstractVisitor {
 
     Object visit(Print s);
 
@@ -43,13 +38,11 @@ public interface Visitor {
 
     Object visit(DoubleConst exp);
 
-    void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit);
+    Object visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit);
 
-    void visit(GlobalVariableDeclaration globalVariableDeclaration);
+    Object visit(GlobalVariableDeclaration globalVariableDeclaration);
 
-    void visit(FunctionDeclaration functionDeclaration);
-
-    void visit (StructInitializer structInitializer);
+    Object visit(FunctionDeclaration functionDeclaration);
 
     Object visit (SimpleInitializer simpleInitializer);
 
@@ -101,9 +94,9 @@ public interface Visitor {
 
     Object visit(VariableDeclarationStatement statement);
 
-    void visit(ContinueStatement statement);
+    Object visit(ContinueStatement statement);
 
-    void visit(BreakStatement statement);
+    Object visit(BreakStatement statement);
 
     Object visit(AssignmentStatement statement);
 
@@ -111,19 +104,11 @@ public interface Visitor {
 
     Object visit(IfStatement statement);
 
-    Object visit(LabelStatement statement);
-
     Object visit(ReturnStatement statement);
 
     Object visit(StatementList statement);
 
-    Object visit(SwitchBlock statement);
-
-    Object visit(SwitchStatement statement);
-
     Object visit(CompoundStatement statement);
-
-    Object visit(LabelBlock statement);
 
     Object visit(IterationStatement statement);
 
@@ -133,19 +118,6 @@ public interface Visitor {
 
     Object visit(ForStatement statement);
 
-    Object visit(StructDeclarationStatement structDefinitionStatement);
+    Object visit (StructInitializer structInitializer);
 
-    Object visit(StructAssignmentStatement structAssignmentStatement);
-
-    void visit(GlobalStructAssignment globalStructAssignment);
-
-    void visit(GlobalStructDeclaration globalStructDeclaration);
-
-    void visit(GlobalStructDefinition globalStructDefinition);
-
-    void visit(StructMemberDeclaration structMemberDeclaration);
-
-    Object visit(StructVariableAssignmentStatement structVariableAssignmentStatement);
-
-    Object visit(StructDefinitionStatement structDefinitionStatement);
 }

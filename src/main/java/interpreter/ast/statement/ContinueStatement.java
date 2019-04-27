@@ -1,6 +1,7 @@
 package interpreter.ast.statement;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ContinueStatement extends Statement {
+public class ContinueStatement implements Statement {
 
-    public Object accept(Visitor v) {
-
-        v.visit(this);
-        return null;
+    public Object accept(AbstractVisitor v) {
+        return v.visit(this);
     }
 }

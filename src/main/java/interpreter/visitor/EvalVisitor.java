@@ -1,7 +1,8 @@
-package interpreter;
+package interpreter.visitor;
 
+import interpreter.Table;
+import interpreter.Util;
 import interpreter.ast.CompoundStatement;
-import interpreter.ast.LabelBlock;
 import interpreter.ast.expression.*;
 import interpreter.ast.expression.additive.AdditiveExpression;
 import interpreter.ast.expression.additive.MinusExpression;
@@ -28,158 +29,46 @@ import interpreter.ast.statement.iteration.DoWhileStatement;
 import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
-import interpreter.ast.statement.struct.StructAssignmentStatement;
-import interpreter.ast.statement.struct.StructDeclarationStatement;
-import interpreter.ast.statement.struct.StructDefinitionStatement;
-import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
+import interpreter.visitor.struct.GlobalStructUnit;
+import interpreter.visitor.struct.StructStatement;
+import interpreter.visitor.struct.StructVisitorImpl;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-class EvalVisitor implements Visitor {
+public class EvalVisitor implements Visitor  {
 
-    private boolean brk = false;
-    private boolean cnt = false;
-    private Table table = new Table(1000);
-    private Util util = new Util();
+    private StructVisitorImpl structVisitor = new StructVisitorImpl();
 
-
-    public void visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit) {
-        abstractGlobalScopeUnit.accept(this);
-
+    @Override
+    public Object visit(StructInitializer structInitializer) {
+       return structVisitor.visit(structInitializer);
     }
 
-    public void visit(FunctionDeclaration functionDeclaration) {
+    protected boolean brk = false;
+    protected boolean cnt = false;
 
-        table.beginScope();
+    public Object visit(AbstractGlobalScopeUnit abstractGlobalScopeUnit) {
+        return abstractGlobalScopeUnit.accept(this);
+    }
+
+    public Object visit(FunctionDeclaration functionDeclaration) {
+
+        Table.beginScope();
         functionDeclaration.getStatementList().accept(this);
-        table.endScope();
-
-    }
-
-    public void visit(StructMemberDeclaration structMemberDeclaration) {
-
-    }
-
-    public void visit(GlobalStructDefinition globalStructDefinition) {
-        if (table.fp == -1)
-            table.beginScope();
-
-        Map<String, Object> structDefaultVariables;
-        structDefaultVariables = util.getVariableDeclarationMap(globalStructDefinition.getStatements(), this);
-        String structId = globalStructDefinition.getStructId();
-        table.addStructDefinition(structId, structDefaultVariables);
-    }
-
-
-    public void visit(GlobalStructDeclaration globalStructDeclaration) {
-
-        String structId = globalStructDeclaration.getStructId();
-        String structInstanceId = globalStructDeclaration.getStructInstanceId();
-
-        Map<String, Object> newStructVariables;
-        newStructVariables = util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), this);
-
-        Map<String, Object> defaultStructVariables;
-        int tempFp = table.fp;
-        Util.setScopeForStructDefinition(structId, table);
-        defaultStructVariables = table.getStructDefinition(structId);
-        table.fp = tempFp;
-
-        Map<String, Object> unChangedDefaultVariables;
-
-        unChangedDefaultVariables = Util.determineUnChangedStructVariablesFor(defaultStructVariables, newStructVariables);
-        newStructVariables.putAll(unChangedDefaultVariables);
-
-        table.assignStruct(structInstanceId, newStructVariables);
-    }
-
-    @Override
-    public Object visit(StructVariableAssignmentStatement structVariableAssignmentStatement) {
-
-        PostfixExpression expression = (PostfixExpression) structVariableAssignmentStatement.getPostfixExpression();
-        String structInstanceId = ((IdExpression) expression.getPrimaryExpression()).getId();
-        String variableId = expression.getChildId();
-        Object value = structVariableAssignmentStatement.getValue().accept(this);
-
-        int tempFp = table.fp;
-        Util.setScopeFor(structInstanceId, variableId, table);
-        table.setStructVariable(structInstanceId, variableId, value);
-        table.fp = tempFp;
-
+        Table.endScope();
         return null;
     }
 
-    @Override
-    public void visit(GlobalStructAssignment globalStructAssignment) {
 
-        String structInstanceId = globalStructAssignment.getStructInstanceId();
 
-        int tempFp = table.fp;
-        Util.setScopeFor(structInstanceId, table);
-
-        Map<String, Object> assignedStructValues = util.getVariableDeclarationMap(globalStructAssignment.getStatements(),this);
-
-        Map<String, Object> oldStructValues = table.getStructInstance(structInstanceId);
-
-        Map<String, Object> unchangedStructVariables;
-
-        unchangedStructVariables = Util.determineUnChangedStructVariablesFor(oldStructValues, assignedStructValues);
-
-        assignedStructValues.putAll(unchangedStructVariables);
-
-        table.assignStruct(structInstanceId, assignedStructValues);
-        table.fp = tempFp;
-    }
-
-    @Override
-    public Object visit(StructAssignmentStatement structAssignmentStatement) {
-        GlobalStructAssignment globalStructAssignment = new GlobalStructAssignment();
-
-        globalStructAssignment.setStatements(structAssignmentStatement.getStatements());
-        globalStructAssignment.setStructInstanceId(structAssignmentStatement.getStructInstanceId());
-        this.visit(globalStructAssignment);
-
-        return null;
-    }
-
-    @Override
-    public Object visit(StructDeclarationStatement structDeclarationStatement) {
-
-        GlobalStructDeclaration globalStructDeclaration = new GlobalStructDeclaration();
-
-        globalStructDeclaration.setStatements(structDeclarationStatement.getStatements());
-        globalStructDeclaration.setStructId(structDeclarationStatement.getStructId());
-        globalStructDeclaration.setStructInstanceId(structDeclarationStatement.getStructInstanceId());
-        globalStructDeclaration.setConstToken(structDeclarationStatement.getConstToken());
-        this.visit(globalStructDeclaration);
-        return null;
-    }
-
-    @Override
-    public Object visit(StructDefinitionStatement structDefinitionStatement) {
-        Map<String, Object> structDefaultVariables;
-        structDefaultVariables = util.getVariableDeclarationMap(structDefinitionStatement.getStatements(), this);
-        String structId = structDefinitionStatement.getStructId();
-        table.addStructDefinition(structId, structDefaultVariables);
-        return null;
-    }
-
-    public void visit(StructInitializer structInitializer) {
-        ExpressionList expressionList = (ExpressionList) structInitializer.getExpressions();
-        expressionList.getE1().accept(this);
-        if (expressionList.getE2() != null)
-            expressionList.getE2().accept(this);
-
-    }
-
-    public void visit(GlobalVariableDeclaration globalVariableDeclaration) {
-        if (table.fp == -1)
-            table.beginScope();
+    public Object visit(GlobalVariableDeclaration globalVariableDeclaration) {
+        if (Table.fp == -1)
+            Table.beginScope();
         Object expression = globalVariableDeclaration.getValue().accept(this);
-        table.add(globalVariableDeclaration.getId(), expression);
+        Table.add(globalVariableDeclaration.getId(), expression);
+        return null;
     }
 
     public Object visit(IntConst exp) {
@@ -406,14 +295,14 @@ class EvalVisitor implements Visitor {
     public Object visit(PostfixExpression expression) {
 
         Object value = null;
-        int fpTemp = table.fp;
+        int fpTemp = Table.fp;
         String structInstanceId = ((IdExpression) expression.getPrimaryExpression()).getId();
         String variableId = expression.getChildId();
 
-        Util.setScopeFor(structInstanceId, variableId, table);
+        Util.setScopeFor(structInstanceId, variableId);
 
-        value = table.getStructVariable(structInstanceId, variableId);
-        table.fp = fpTemp;
+        value = Table.getStructVariable(structInstanceId, variableId);
+        Table.fp = fpTemp;
         return value;
     }
 
@@ -428,26 +317,28 @@ class EvalVisitor implements Visitor {
 
     public Object visit(VariableDeclarationStatement statement) {
 
-        this.table.add(statement.getId(), statement.getValueExp().accept(this));
+        Table.add(statement.getId(), statement.getValueExp().accept(this));
         return statement;
 
     }
 
     @Override
-    public void visit(ContinueStatement statement) {
+    public Object visit(ContinueStatement statement) {
         cnt = true;
+        return null;
     }
 
     @Override
-    public void visit(BreakStatement statement) {
+    public Object visit(BreakStatement statement) {
         brk = true;
+        return null;
     }
 
     @Override
     public Object visit(AssignmentStatement statement) {
 
         Object value = statement.getValueExp().accept(this);
-        table.add(statement.getId(), value);
+        Table.add(statement.getId(), value);
 
         return null;
 
@@ -466,72 +357,17 @@ class EvalVisitor implements Visitor {
     public Object visit(IfStatement statement) {
 
         Object boolExp = statement.getBoolExpression().accept(this);
-        table.beginScope();
+        Table.beginScope();
         if ((boolean) boolExp) {
             statement.getTrueBlock().accept(this);
         } else if (statement.getElseBlock() != null) {
             statement.getElseBlock().accept(this);
         }
-        table.endScope();
+        Table.endScope();
 
         return null;
     }
 
-    @Override
-    public Object visit(LabelStatement statement) {
-
-        return statement.getStatementList().accept(this);
-    }
-
-
-    @Override
-    public Object visit(SwitchBlock statement) {
-
-        LabelBlock labelBlock = ((LabelBlock) statement.getLabelBlock());
-        BoolExpression isDefaultLabel = new BoolExpression(
-                Objects.isNull(labelBlock.getLabelExpression()));
-
-        if (isDefaultLabel.isBoolValue())
-            SwitchBlock.setDefaultStatement(labelBlock.getLabelStatement());
-
-        // burdan null donerse eşleşen case bulunmamıştır
-        // eger default label ise ignore ediyoruz.
-        if (!isDefaultLabel.isBoolValue())
-            SwitchBlock.setIsCaseFound(
-                    new BoolExpression(Objects.nonNull(statement.getLabelBlock().accept(this))));
-
-        // eger null ise. butun switch caseleri denenmis ve istenilen sonuc bulunamamistir.
-        boolean hasMoreLabelBlocks;
-        hasMoreLabelBlocks = (Objects.nonNull(statement.getSwitchBlock()));
-
-
-        if (!SwitchBlock.getIsCaseFound().isBoolValue() && hasMoreLabelBlocks) {
-            statement.getSwitchBlock().accept(this);
-            return null;
-        }
-        boolean isDefaultCaseExists = Objects.nonNull(SwitchBlock.getDefaultStatement());
-        if (!SwitchBlock.getIsCaseFound().isBoolValue() && !hasMoreLabelBlocks && isDefaultCaseExists)
-            SwitchBlock.getDefaultStatement().accept(this);
-        return null;
-    }
-
-    @Override
-    public Object visit(SwitchStatement statement) {
-
-        return statement.getSwitchBlock().accept(this);
-    }
-
-    @Override
-    public Object visit(LabelBlock statement) {
-
-        Object labelExpression = statement.getLabelExpression().accept(this);
-        Object switchExpression = statement.getSwitchExpression().accept(this);
-
-        if (labelExpression.equals(switchExpression))
-            return statement.getLabelStatement().accept(this);
-
-        return null;
-    }
 
     @Override
     public Object visit(ReturnStatement statement) {
@@ -561,7 +397,7 @@ class EvalVisitor implements Visitor {
     @Override
     public Object visit(ForStatement statement) {
 
-        table.beginScope();
+        Table.beginScope();
         if (statement.getForIndex() != null)
             statement.getForIndex().accept(this);
 
@@ -574,7 +410,7 @@ class EvalVisitor implements Visitor {
                 statement.getForIncrement().accept(this);
         }
 
-        table.endScope();
+        Table.endScope();
         return null;
     }
 
@@ -582,15 +418,15 @@ class EvalVisitor implements Visitor {
     public Object visit(IdExpression idExpression) {
 
        Object value = null;
-        int fpTemp = table.fp;
+        int fpTemp = Table.fp;
         while (Objects.isNull(value)) {
-            value = table.get(idExpression.getId());
-            table.fp--;
-            if (table.fp == -1) {
+            value = Table.get(idExpression.getId());
+            Table.fp--;
+            if (Table.fp == -1) {
                 break;
             }
         }
-        table.fp = fpTemp;
+        Table.fp = fpTemp;
         return value;
     }
 }

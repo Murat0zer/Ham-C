@@ -1,8 +1,10 @@
 package interpreter.ast.statement.struct;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.statement.AssignmentStatement;
-import interpreter.ast.statement.Statement;
+import interpreter.visitor.struct.StructStatement;
+import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,15 +16,19 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StructAssignmentStatement extends Statement {
+public class StructAssignmentStatement implements StructStatement {
 
   private String structInstanceId;
   private Set<AssignmentStatement> statements;
   private String constToken;
 
   @Override
-  public Object accept(Visitor v) {
+  public Object accept(AbstractVisitor v) {
     return v.visit(this);
   }
 
+  @Override
+  public Object accept(StructVisitor structVisitor) {
+    return structVisitor.visit(this);
+  }
 }

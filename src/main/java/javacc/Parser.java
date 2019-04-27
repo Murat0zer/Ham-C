@@ -12,6 +12,7 @@ import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
 import interpreter.ast.statement.struct.*;
+import interpreter.ast.statement._switch.*;
 import interpreter.ast.statement.*;
 public class Parser implements ParserConstants {
         public static void main(String args[]) throws ParseException {
@@ -950,7 +951,7 @@ public class Parser implements ParserConstants {
         constantExpression = constantExpression();
         jj_consume_token(COLON);
         labelStatement = labelStatement();
-            {if (true) return new LabelBlock(constantExpression, labelStatement, switchExpression);}
+            {if (true) return new interpreter.ast.statement._switch.LabelBlock(constantExpression, labelStatement, switchExpression);}
         break;
       case DEFAULT_:
         jj_consume_token(DEFAULT_);
@@ -1789,11 +1790,6 @@ public class Parser implements ParserConstants {
     finally { jj_save(17, xla); }
   }
 
-  static private boolean jj_3R_33() {
-    if (jj_3R_49()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_31() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2615,6 +2611,11 @@ public class Parser implements ParserConstants {
     if (jj_3R_32()) return true;
     if (jj_scan_token(ASSIGN)) return true;
     if (jj_3R_33()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_33() {
+    if (jj_3R_49()) return true;
     return false;
   }
 

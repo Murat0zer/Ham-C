@@ -1,7 +1,7 @@
 package interpreter.ast.expression.multiplicative;
 
-import interpreter.Visitor;
 import interpreter.ast.expression.Expression;
+import interpreter.visitor.AbstractVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,13 +11,14 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DivideExpression extends Expression {
+public class DivideExpression implements Expression {
 
     private Expression left;
     private Expression right;
 
+
     @Override
-    public Object accept(Visitor v) {
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
     }
 }

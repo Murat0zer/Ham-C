@@ -1,6 +1,7 @@
 package interpreter.ast.expression.equality;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +12,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotEqualExpression extends Expression {
+public class NotEqualExpression implements Expression {
 
     private Expression left;
     private Expression right;
 
-    @Override
-    public Object accept(Visitor v) {
+
+@Override
+public Object accept(AbstractVisitor v) {
         return v.visit(this);
     }
 }

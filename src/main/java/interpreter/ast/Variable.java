@@ -1,14 +1,15 @@
 
 package interpreter.ast;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Variable extends Expression {
+public class Variable implements Expression {
 
     private String type;
     private String value;
@@ -18,10 +19,9 @@ public class Variable extends Expression {
         this.value = value;
     }
 
-    @Override
-    public Object accept(Visitor v) {
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-}
+    }}
 
 

@@ -1,8 +1,11 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.statement.VariableDeclarationStatement;
+import interpreter.visitor.struct.GlobalStructUnit;
+import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +17,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GlobalStructDeclaration extends AbstractGlobalScopeUnit {
+public class GlobalStructDeclaration implements GlobalStructUnit {
 
   private String structId;
   private String structInstanceId;
@@ -22,7 +25,13 @@ public class GlobalStructDeclaration extends AbstractGlobalScopeUnit {
   private Object constToken;
 
   @Override
-  public void accept(Visitor v) {
-    v.visit(this);
+  public Object accept(StructVisitor v) {
+    return v.visit(this);
+
+  }
+
+  @Override
+  public Object accept(AbstractVisitor v) {
+    return v.visit(this);
   }
 }

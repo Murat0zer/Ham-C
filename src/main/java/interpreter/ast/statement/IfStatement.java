@@ -1,6 +1,7 @@
 package interpreter.ast.statement;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class IfStatement extends Statement {
+public class IfStatement implements Statement {
 
     private Expression boolExpression;
     private Statement trueBlock;
     private Statement elseBlock;
 
-    public Object accept(Visitor v) {
-       return v.visit(this);
-    }
-}
+@Override
+    public Object accept(AbstractVisitor v) {
+        return v.visit(this);
+    }}

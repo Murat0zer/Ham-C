@@ -1,6 +1,7 @@
 package interpreter.ast.expression;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class IdExpression extends  Expression {
+public class IdExpression implements   Expression {
 
     private String id;
 
     @Override
-    public Object accept(Visitor v) {
+    public Object accept(AbstractVisitor v) {
       return  v.visit(this);
     }
 }

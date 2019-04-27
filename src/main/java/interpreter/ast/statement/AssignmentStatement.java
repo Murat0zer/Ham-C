@@ -1,6 +1,7 @@
 package interpreter.ast.statement;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +12,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentStatement extends Statement {
+public class AssignmentStatement implements Statement {
 
     private Expression valueExp;
     private String id;
 
     @Override
-    public Object accept(Visitor v) {
-        return v.visit(this);
+    public Object accept(AbstractVisitor v) {
+         return v.visit(this);
     }
 }

@@ -1,13 +1,14 @@
 package interpreter.ast.expression.additive;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AdditiveExpression extends Expression {
+public class AdditiveExpression implements Expression {
 
     private Expression left;
     private Expression right;
@@ -19,7 +20,8 @@ public class AdditiveExpression extends Expression {
         this.right = right;
     }
 
-    public Object accept(Visitor v) {
+    @Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
     }
 

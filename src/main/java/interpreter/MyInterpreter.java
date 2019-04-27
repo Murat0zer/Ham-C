@@ -1,6 +1,9 @@
 package interpreter;
 
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
+import interpreter.visitor.VisitorVisitor;
 import javacc.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +23,16 @@ public class MyInterpreter {
             File initialFile = new File("program.hc");
             InputStream targetStream = new FileInputStream(initialFile);
 
-            EvalVisitor evalVisitor = new EvalVisitor();
+            VisitorVisitor visitor = new VisitorVisitor();
             new Parser(targetStream);
             List<AbstractGlobalScopeUnit> abstractGlobalScopeUnits = Parser.start();
 
             for (AbstractGlobalScopeUnit abstractGlobalScopeUnit : abstractGlobalScopeUnits) {
-                evalVisitor.visit(abstractGlobalScopeUnit);
+                visitor.visit(abstractGlobalScopeUnit);
             }
 
         } catch (Exception exception) {
-            log.error(exception.getMessage());
-            log.error(exception.getCause().getMessage());
+            log.error(exception.getMessage(), exception);
         }
     }
 }

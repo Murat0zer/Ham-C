@@ -1,6 +1,7 @@
 package interpreter.ast.statement.iteration;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.statement.Statement;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class WhileStatement extends IterationStatement {
     }
 
     @Override
-    public Object accept(Visitor v) {
+    public Object accept(AbstractVisitor v) {
         v.visit(this);
         return null;
     }

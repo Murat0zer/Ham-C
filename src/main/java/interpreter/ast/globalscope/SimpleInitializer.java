@@ -1,9 +1,8 @@
 package interpreter.ast.globalscope;
 
-import interpreter.Visitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.globalscope.struct.StructInitializer;
-import lombok.AllArgsConstructor;
+import interpreter.visitor.AbstractVisitor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SimpleInitializer extends Expression {
+public class SimpleInitializer implements Expression {
 
     private Expression expression;
 
@@ -25,7 +24,8 @@ public class SimpleInitializer extends Expression {
         this.structInitializer = structInitializer;
     }
 
-    public Object accept(Visitor v) {
+    @Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
     }
 }

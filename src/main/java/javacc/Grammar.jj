@@ -17,6 +17,7 @@ import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
 import interpreter.ast.statement.struct.*;
+import interpreter.ast.statement._switch.*;
 import interpreter.ast.statement.*;
 public class Parser {
 	public static void main(String args[]) throws ParseException {
@@ -484,7 +485,7 @@ Statement labelBlock(Expression switchExpression) :
 {
 	  <CASE> constantExpression = constantExpression() <COLON> labelStatement = labelStatement()
 
-	  { return new LabelBlock(constantExpression, labelStatement, switchExpression); }
+	  { return new interpreter.ast.statement._switch.LabelBlock(constantExpression, labelStatement, switchExpression); }
 
 	| <DEFAULT_> <COLON> labelStatement = labelStatement()
 

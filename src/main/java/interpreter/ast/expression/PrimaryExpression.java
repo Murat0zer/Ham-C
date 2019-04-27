@@ -1,12 +1,13 @@
 package interpreter.ast.expression;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class PrimaryExpression extends Expression {
+public class PrimaryExpression implements Expression {
 
     private Expression exp;
     private String id;
@@ -16,7 +17,7 @@ public class PrimaryExpression extends Expression {
         this.exp = exp;
     }
 
-    public Object accept(Visitor v) {
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-}
+    }}

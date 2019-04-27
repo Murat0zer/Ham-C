@@ -1,8 +1,9 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.Visitor;
-import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.ast.statement.AssignmentStatement;
+import interpreter.visitor.struct.GlobalStructUnit;
+import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +15,19 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GlobalStructAssignment extends AbstractGlobalScopeUnit {
+public class GlobalStructAssignment implements GlobalStructUnit {
 
   private String structInstanceId;
   private Set<AssignmentStatement> statements;
   private Object constToken;
 
   @Override
-  public void accept(Visitor v) {
-    v.visit(this);
+  public Object accept(AbstractVisitor v) {
+    return v.visit(this);
+  }
+
+  @Override
+  public Object accept(StructVisitor structVisitor) {
+    return structVisitor.visit(this);
   }
 }

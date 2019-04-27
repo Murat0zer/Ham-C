@@ -1,10 +1,11 @@
 package interpreter.ast;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.statement.Statement;
 
-public class Seq extends Expression {
+public class Seq implements Expression {
     Statement s;
     Expression e;
 
@@ -13,7 +14,7 @@ public class Seq extends Expression {
         e = b;
     }
 
-    public Object accept(Visitor v) {
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-}
+    }}

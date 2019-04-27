@@ -1144,12 +1144,12 @@ ERROR main interpreter.MyInterpreter -
 ERROR main interpreter.MyInterpreter - 
 ERROR main interpreter.MyInterpreter - 
 ERROR main interpreter.MyInterpreter - 
-ERROR main interpreter.EvalVisitor - Variable does not exist = null.a
-ERROR main interpreter.EvalVisitor - Variable does not exist = null.a
+ERROR main interpreter.visitor.EvalVisitor - Variable does not exist = null.a
+ERROR main interpreter.visitor.EvalVisitor - Variable does not exist = null.a
 ERROR main interpreter.MyInterpreter - 
 ERROR main interpreter.MyInterpreter - 
-ERROR main interpreter.EvalVisitor - Variable does not exist = structTest.a
-ERROR main interpreter.EvalVisitor - Variable does not exist = structTest.a
+ERROR main interpreter.visitor.EvalVisitor - Variable does not exist = structTest.a
+ERROR main interpreter.visitor.EvalVisitor - Variable does not exist = structTest.a
 ERROR main interpreter.MyInterpreter - Encountered " "." ". "" at line 11, column 11.
 Was expecting one of:
     <ID> ...
@@ -1534,3 +1534,46 @@ ERROR main interpreter.MyInterpreter -
 ERROR main interpreter.MyInterpreter - 
 ERROR main interpreter.MyInterpreter - 
 ERROR main interpreter.MyInterpreter - 
+ERROR main interpreter.MyInterpreter - interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.AbstractVisitor
+ERROR main interpreter.MyInterpreter - interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.AbstractVisitor
+java.lang.ClassCastException: interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.AbstractVisitor
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:24)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.visitor.VisitorVisitor - interpreter.ast.globalscope.struct.GlobalStructDefinition.accept()
+java.lang.NoSuchMethodException: interpreter.ast.globalscope.struct.GlobalStructDefinition.accept()
+	at java.lang.Class.getDeclaredMethod(Class.java:2130)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:19)
+	at interpreter.ast.globalscope.struct.GlobalStructDefinition.accept(GlobalStructDefinition.java:28)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:40)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.visitor.VisitorVisitor - interpreter.ast.globalscope.FunctionDeclaration.accept()
+java.lang.NoSuchMethodException: interpreter.ast.globalscope.FunctionDeclaration.accept()
+	at java.lang.Class.getDeclaredMethod(Class.java:2130)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:19)
+	at interpreter.ast.globalscope.FunctionDeclaration.accept(FunctionDeclaration.java:27)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:40)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.visitor.VisitorVisitor - java.lang.Class.accept(interpreter.visitor.AbstractVisitor)
+java.lang.NoSuchMethodException: java.lang.Class.accept(interpreter.visitor.AbstractVisitor)
+	at java.lang.Class.getMethod(Class.java:1786)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:19)
+	at interpreter.ast.globalscope.struct.GlobalStructDefinition.accept(GlobalStructDefinition.java:28)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:40)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.visitor.VisitorVisitor - java.lang.Class.accept(interpreter.visitor.AbstractVisitor)
+java.lang.NoSuchMethodException: java.lang.Class.accept(interpreter.visitor.AbstractVisitor)
+	at java.lang.Class.getMethod(Class.java:1786)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:21)
+	at interpreter.ast.globalscope.struct.GlobalStructDefinition.accept(GlobalStructDefinition.java:28)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:42)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.MyInterpreter - interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.struct.StructVisitor
+java.lang.ClassCastException: interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.struct.StructVisitor
+	at interpreter.ast.globalscope.struct.GlobalStructDefinition.accept(GlobalStructDefinition.java:28)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:40)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)
+ERROR main interpreter.MyInterpreter - interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.struct.StructVisitor
+java.lang.ClassCastException: interpreter.visitor.VisitorVisitor cannot be cast to interpreter.visitor.struct.StructVisitor
+	at interpreter.ast.globalscope.struct.GlobalStructDefinition.accept(GlobalStructDefinition.java:28)
+	at interpreter.visitor.VisitorVisitor.visit(VisitorVisitor.java:38)
+	at interpreter.MyInterpreter.main(MyInterpreter.java:31)

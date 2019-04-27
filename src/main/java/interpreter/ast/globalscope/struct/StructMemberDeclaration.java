@@ -1,14 +1,15 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 
-public class StructMemberDeclaration extends AbstractGlobalScopeUnit {
+public class StructMemberDeclaration implements AbstractGlobalScopeUnit {
 
     public StructMemberDeclaration() {
     }
 
-    public void accept(Visitor v) {
-        v.visit(this);
+    @Override
+    public Object accept(AbstractVisitor v) {
+        return v.visit(this);
     }
 }

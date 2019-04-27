@@ -1,12 +1,13 @@
 package interpreter.ast.expression;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UnaryExpression extends Expression {
+public class UnaryExpression implements Expression {
 
     private Expression expression;
     private String unaryOp = null;
@@ -16,8 +17,7 @@ public class UnaryExpression extends Expression {
         this.unaryOp = unaryOp;
     }
 
-    public Object accept(Visitor v) {
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-
-}
+    }}

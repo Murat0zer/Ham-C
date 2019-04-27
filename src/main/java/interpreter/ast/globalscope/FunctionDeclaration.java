@@ -1,13 +1,14 @@
 package interpreter.ast.globalscope;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.statement.Statement;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FunctionDeclaration extends AbstractGlobalScopeUnit {
+public class FunctionDeclaration implements AbstractGlobalScopeUnit {
 
     private String id;
     private java.util.List parameterList;
@@ -21,7 +22,8 @@ public class FunctionDeclaration extends AbstractGlobalScopeUnit {
         this.returnType = returnType;
     }
 
-    public void accept(Visitor v) {
-        v.visit(this);
+    @Override
+    public Object accept(AbstractVisitor v) {
+       return v.visit(this);
     }
 }

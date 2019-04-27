@@ -1,6 +1,7 @@
 package interpreter;
 
 import interpreter.ast.expression.Expression;
+import interpreter.visitor.AbstractVisitor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,55 +14,57 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
-class Util {
+public class Util {
 
-    static int setScopeFor(String structInstanceId, String variableId, Table table) {
+    private Util() {}
+
+    public static int setScopeFor(String structInstanceId, String variableId) {
 
         Object value = null;
         while (Objects.isNull(value)) {
             try {
-                value = table.getStructVariable(structInstanceId, variableId);
+                value = Table.getStructVariable(structInstanceId, variableId);
             } catch (NullPointerException e) {
                 log.trace("Cannot find variable in this scope. Checking higher scopes...");
-                table.fp--;
-                if (table.fp == -1) {
+                Table.fp--;
+                if (Table.fp == -1) {
                     log.error("Variable does not exist = {}", structInstanceId + "." + variableId);
                     break;
                 }
             }
 
         }
-        return table.fp;
+        return Table.fp;
     }
 
-    static void setScopeFor(String structInstanceId, Table table) {
+    public static void setScopeFor(String structInstanceId) {
 
-        Object value = table.getStructInstance(structInstanceId);
+        Object value = Table.getStructInstance(structInstanceId);
         while (Objects.isNull(value)) {
                 log.trace("Cannot find struct in this scope. Checking higher scopes...");
-                table.fp--;
-                if (table.fp == -1) {
+                Table.fp--;
+                if (Table.fp == -1) {
                     log.error("Struct does not exist = {}", structInstanceId);
                     break;
                 }
-            value = table.getStructInstance(structInstanceId);
+            value = Table.getStructInstance(structInstanceId);
         }
     }
 
-    public static void setScopeForStructDefinition(String structId, Table table) {
-        Object value = table.getStructDefinition(structId);
+    public static void setScopeForStructDefinition(String structId) {
+        Object value = Table.getStructDefinition(structId);
         while (Objects.isNull(value)) {
             log.trace("Cannot find struct Definition in this scope. Checking higher scopes...");
-            table.fp--;
-            if (table.fp == -1) {
+            Table.fp--;
+            if (Table.fp == -1) {
                 log.error("Struct Definition does not exist = {}", structId);
                 break;
             }
-            value = table.getStructDefinition(structId);
+            value = Table.getStructDefinition(structId);
         }
     }
 
-    static Map<String, Object> determineUnChangedStructVariablesFor(Map<String, Object> oldValues, Map<String, Object> newValues) {
+    public static Map<String, Object> determineUnChangedStructVariablesFor(Map<String, Object> oldValues, Map<String, Object> newValues) {
 
         Predicate<Map.Entry<String, Object>> entryPredicate = s -> !(newValues.keySet().contains(s.getKey()));
         return oldValues
@@ -73,7 +76,7 @@ class Util {
 
 
 
-    <T> Map<String, Object> getVariableDeclarationMap(Set<T> statementSet, Visitor visitor) {
+    public static <T> Map<String, Object> getVariableDeclarationMap(Set<T> statementSet, AbstractVisitor visitor) {
 
         Map<String, Object> variableMap = new HashMap<>();
 

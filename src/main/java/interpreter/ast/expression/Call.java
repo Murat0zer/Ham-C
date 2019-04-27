@@ -1,8 +1,9 @@
 package interpreter.ast.expression;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 
-public class Call extends Expression {
+public class Call implements Expression {
     String id;
     Expression e;
 
@@ -11,7 +12,7 @@ public class Call extends Expression {
         e = b;
     }
 
-    public Object accept(Visitor v) {
+@Override
+    public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }
-}
+    }}

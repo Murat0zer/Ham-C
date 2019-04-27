@@ -1,13 +1,14 @@
 package interpreter.ast.expression.constant;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class IntConst extends Expression {
+public class IntConst implements Expression {
 
     private int constInt;
 
@@ -15,7 +16,7 @@ public class IntConst extends Expression {
         constInt = integer;
     }
 
-    public Object accept(Visitor v) {
-            return v.visit(this);
-    }
-}
+@Override
+    public Object accept(AbstractVisitor v) {
+        return v.visit(this);
+    }}

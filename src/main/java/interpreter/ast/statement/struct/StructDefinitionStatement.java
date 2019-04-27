@@ -1,8 +1,11 @@
 package interpreter.ast.statement.struct;
 
-import interpreter.Visitor;
+import interpreter.visitor.AbstractVisitor;
+import interpreter.visitor.EvalVisitor;
 import interpreter.ast.statement.Statement;
 import interpreter.ast.statement.VariableDeclarationStatement;
+import interpreter.visitor.struct.StructStatement;
+import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,13 +17,18 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StructDefinitionStatement extends Statement {
+public class StructDefinitionStatement implements StructStatement {
 
     private String structId;
     private Set<VariableDeclarationStatement> statements;
     private Object constToken;
 
-    public Object accept(Visitor v) {
+    public Object accept(AbstractVisitor v) {
       return  v.visit(this);
+    }
+
+    @Override
+    public Object accept(StructVisitor structVisitor) {
+        return structVisitor.visit(this);
     }
 }
