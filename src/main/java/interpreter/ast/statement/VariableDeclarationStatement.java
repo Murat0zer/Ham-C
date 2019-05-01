@@ -3,6 +3,7 @@ package interpreter.ast.statement;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
+import interpreter.visitor.StatementUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class VariableDeclarationStatement implements Statement {
+public class VariableDeclarationStatement implements StatementUnit {
 
     private String type;
     private String id;
@@ -21,4 +22,10 @@ public class VariableDeclarationStatement implements Statement {
     @Override
     public Object accept(AbstractVisitor v) {
         return v.visit(this);
-    }}
+    }
+
+    @Override
+    public Object accept(EvalVisitor evalVisitor) {
+        return evalVisitor.visit(this);
+    }
+}

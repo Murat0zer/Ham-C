@@ -1,6 +1,6 @@
 package interpreter.ast.statement._switch;
 
-import interpreter.ast.expression.BoolExpression;
+import interpreter.ast.expression.logical.BoolExpression;
 import interpreter.ast.statement.Statement;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor._switch.SwitchUnit;

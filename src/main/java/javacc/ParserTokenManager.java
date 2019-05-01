@@ -3,16 +3,19 @@ package javacc;
 import interpreter.*;
 import interpreter.ast.*;
 import interpreter.ast.expression.*;
+import interpreter.ast.expression.function.*;
 import interpreter.ast.expression.constant.*;
-import interpreter.ast.expression.additive.*;
-import interpreter.ast.expression.equality.*;
-import interpreter.ast.expression.multiplicative.*;
-import interpreter.ast.expression.relational.*;
+import interpreter.ast.expression.arithmetic.additive.*;
+import interpreter.ast.expression.arithmetic.multiplicative.*;
+import interpreter.ast.expression.logical.equality.*;
+import interpreter.ast.expression.logical.relational.*;
+import interpreter.ast.expression.logical.*;
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.iteration.*;
 import interpreter.ast.statement.struct.*;
 import interpreter.ast.statement._switch.*;
+import interpreter.ast.statement.flow_control.*;
 import interpreter.ast.statement.*;
 
 /** Token Manager. */

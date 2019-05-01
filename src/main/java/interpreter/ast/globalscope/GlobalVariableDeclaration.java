@@ -3,6 +3,7 @@ package interpreter.ast.globalscope;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
+import interpreter.visitor.GlobalUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GlobalVariableDeclaration implements AbstractGlobalScopeUnit {
+public class GlobalVariableDeclaration implements GlobalUnit {
 
     private String type;
     private String id;
@@ -21,5 +22,10 @@ public class GlobalVariableDeclaration implements AbstractGlobalScopeUnit {
     @Override
     public Object accept(AbstractVisitor v)  {
         return v.visit(this);
+    }
+
+    @Override
+    public Object accept(EvalVisitor evalVisitor) {
+        return evalVisitor.visit(this);
     }
 }

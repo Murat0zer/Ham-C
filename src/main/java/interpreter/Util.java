@@ -1,6 +1,7 @@
 package interpreter;
 
 import interpreter.ast.expression.Expression;
+import interpreter.ast.expression.function.FunctionCall;
 import interpreter.visitor.AbstractVisitor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,4 +107,7 @@ public class Util {
     }
 
 
+    public static void addFunctionParametersToTable(FunctionCall functionCall) {
+
+    }
 }

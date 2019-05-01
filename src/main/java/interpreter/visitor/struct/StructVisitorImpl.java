@@ -11,10 +11,11 @@ import interpreter.ast.statement.struct.StructAssignmentStatement;
 import interpreter.ast.statement.struct.StructDeclarationStatement;
 import interpreter.ast.statement.struct.StructDefinitionStatement;
 import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
+import interpreter.visitor.VisitorVisitor;
 
 import java.util.Map;
 
-public class StructVisitorImpl implements StructVisitor  {
+public class StructVisitorImpl  implements StructVisitor  {
 
 
     @Override
@@ -27,10 +28,12 @@ public class StructVisitorImpl implements StructVisitor  {
         return structStatement.accept(this);
     }
 
+    @Override
     public Object visit(StructMemberDeclaration structMemberDeclaration) {
         return null;
     }
 
+    @Override
     public Object visit(GlobalStructDefinition globalStructDefinition) {
         if (Table.fp == -1)
             Table.beginScope();
@@ -43,13 +46,14 @@ public class StructVisitorImpl implements StructVisitor  {
     }
 
 
+    @Override
     public Object visit(GlobalStructDeclaration globalStructDeclaration) {
 
         String structId = globalStructDeclaration.getStructId();
         String structInstanceId = globalStructDeclaration.getStructInstanceId();
 
         Map<String, Object> newStructVariables;
-        newStructVariables = Util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), this);
+        newStructVariables = Util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), new VisitorVisitor());
 
         Map<String, Object> defaultStructVariables;
         int tempFp = Table.fp;
@@ -119,6 +123,7 @@ public class StructVisitorImpl implements StructVisitor  {
     @Override
     public Object visit(StructDeclarationStatement structDeclarationStatement) {
 
+        // TODO: 28.04.2019 global degil local olmasi lazim bunun.
         GlobalStructDeclaration globalStructDeclaration = new GlobalStructDeclaration();
 
         globalStructDeclaration.setStatements(structDeclarationStatement.getStatements());
@@ -138,6 +143,7 @@ public class StructVisitorImpl implements StructVisitor  {
         return null;
     }
 
+    @Override
     public Object visit(StructInitializer structInitializer) {
         ExpressionList expressionList = (ExpressionList) structInitializer.getExpressions();
         expressionList.getE1().accept(this);

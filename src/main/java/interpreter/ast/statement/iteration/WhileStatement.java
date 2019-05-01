@@ -4,6 +4,8 @@ import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.statement.Statement;
+import interpreter.visitor.iteration.IterationUnit;
+import interpreter.visitor.iteration.IterationVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class WhileStatement extends IterationStatement {
+public class WhileStatement extends IterationStatement implements IterationUnit {
 
     public WhileStatement(Expression boolExpression, Statement iterationBody) {
         super(boolExpression, iterationBody);
@@ -21,5 +23,10 @@ public class WhileStatement extends IterationStatement {
     public Object accept(AbstractVisitor v) {
         v.visit(this);
         return null;
+    }
+
+    @Override
+    public Object accept(IterationVisitor iterationVisitor) {
+        return iterationVisitor.visit(this);
     }
 }

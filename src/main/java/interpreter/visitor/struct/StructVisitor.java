@@ -9,7 +9,10 @@ import interpreter.visitor.AbstractVisitor;
 
 public interface StructVisitor extends AbstractVisitor {
 
+    @Override
+    Object visit(GlobalStructUnit globalStructUnit);
 
+    @Override
     Object visit(StructStatement structStatement);
 
     Object visit(StructDeclarationStatement structDefinitionStatement);

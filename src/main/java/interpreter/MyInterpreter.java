@@ -1,8 +1,7 @@
 package interpreter;
 
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
-import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
+import interpreter.ast.expression.function.FunctionCall;
 import interpreter.visitor.VisitorVisitor;
 import javacc.Parser;
 import org.slf4j.Logger;
@@ -30,6 +29,10 @@ public class MyInterpreter {
             for (AbstractGlobalScopeUnit abstractGlobalScopeUnit : abstractGlobalScopeUnits) {
                 visitor.visit(abstractGlobalScopeUnit);
             }
+            FunctionCall functionCall = new FunctionCall();
+            functionCall.setFunctionId("main");
+            visitor.visit(functionCall);
+
 
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);

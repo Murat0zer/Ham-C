@@ -8,16 +8,21 @@ package javacc;
 import interpreter.*;
 import interpreter.ast.*;
 import interpreter.ast.expression.*;
+import interpreter.ast.expression.function.*;
 import interpreter.ast.expression.constant.*;
-import interpreter.ast.expression.additive.*;
-import interpreter.ast.expression.equality.*;
-import interpreter.ast.expression.multiplicative.*;
-import interpreter.ast.expression.relational.*;
+import interpreter.ast.expression.arithmetic.additive.*;
+import interpreter.ast.expression.arithmetic.multiplicative.*;
+import interpreter.ast.expression.logical.equality.*;
+import interpreter.ast.expression.logical.relational.*;
+import interpreter.ast.expression.logical.*;
+
 import interpreter.ast.globalscope.*;
 import interpreter.ast.globalscope.struct.*;
+
 import interpreter.ast.statement.iteration.*;
 import interpreter.ast.statement.struct.*;
 import interpreter.ast.statement._switch.*;
+import interpreter.ast.statement.flow_control.*;
 import interpreter.ast.statement.*;
 public class Parser {
 	public static void main(String args[]) throws ParseException {
@@ -134,15 +139,15 @@ AbstractGlobalScopeUnit globalScopeUnit() :
         globalScopeUnit = globalStructDeclaration() { return globalScopeUnit; } |
         LOOKAHEAD(3)
         globalScopeUnit = globalDeclaration() { return globalScopeUnit; } |
-        globalScopeUnit = functionDeclaration() { return globalScopeUnit; }
+        globalScopeUnit = functionDefinition() { return globalScopeUnit; }
 }
 
-AbstractGlobalScopeUnit functionDeclaration() :
+AbstractGlobalScopeUnit functionDefinition() :
 { Token t; java.util.List parameterList; Statement body; String returnType; }
 {
 	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> body = compoundStatement()
 
-    { return new FunctionDeclaration(returnType, t.image, parameterList, body );  }
+    { return new FunctionDefinitionDefinition(returnType, t.image, parameterList, body );  }
 }
 
 String returnType() :
@@ -174,7 +179,7 @@ java.util.List parameterList() :
 java.util.List formalList() :
 { Token t; String type; java.util.List<Variable> parameterList = new java.util.ArrayList(); }
 {
-	(<COMMA> (<CONST>)? type = type() t = <ID> { parameterList.add(new Variable(type, t.image)); })*
+	( (<CONST>)? type = type() t = <ID> (<COMMA>)? { parameterList.add(new Variable(type, t.image)); })*
 
 		{ return parameterList; }
 }
@@ -301,7 +306,7 @@ Expression simpleInitializer() :
 	t = <INTCONST> { return new IntConst(Integer.parseInt(t.image)); }     |
 	t = <DOUBLECONST> { return new DoubleConst(Double.parseDouble(t.image)); } |
 	    <TRUE> { return new BoolExpression(true); } |
-	    <FALSE> { return new BoolExpression(false); }|
+	    <FALSE> { return new interpreter.ast.expression.logical.BoolExpression(false); }|
     t = <STRCONST> { return new StrConst(t.image); }
 }
 
@@ -342,9 +347,6 @@ Statement statement() :
       LOOKAHEAD(2)
       stm = structDeclarationStatement() { return stm; }
     |
-      LOOKAHEAD(2)
-      stm = structAssignmentStatement() { return stm; }
-    |
 	  LOOKAHEAD(2)
       stm = variableDeclarationStatement() { return stm; }
 	| stm = expressionOrAssignmentStatement() { return stm; }
@@ -360,24 +362,29 @@ Statement statement() :
 Statement expressionOrAssignmentStatement() :
 { Statement statement; }
 {
-       LOOKAHEAD(2)
-       statement = assignmentStatement() { return statement; } |
+       LOOKAHEAD(3)
        statement = expressionStatement() { return statement; }
+       |
+       statement = assignmentStatement() { return statement; }
 }
 
 Statement assignmentStatement() :
-{ Expression expression; Token t;  Expression pfExp;
+{ Statement stm; Expression expression; Token t;  Expression pfExp;
 }
 {
-    LOOKAHEAD(2)
-	t = <ID> <ASSIGN> expression = expression() <SEMI>
 
-	{ return new AssignmentStatement(expression, t.image); }
+     LOOKAHEAD(3)
+     stm = structAssignmentStatement() { return stm; }
+    |
+     LOOKAHEAD(3)
+	 t = <ID> <ASSIGN> expression = expression() <SEMI>
+
+	 { return new AssignmentStatement(expression, t.image); }
 
 	|
-    LOOKAHEAD(3)
-	pfExp = postfixExpression() <ASSIGN>  expression = expression() <SEMI>
-    {return new StructVariableAssignmentStatement(pfExp, expression); }
+     LOOKAHEAD(3)
+ 	 pfExp = postfixExpression() <ASSIGN>  expression = expression() <SEMI>
+     {return new StructVariableAssignmentStatement(pfExp, expression); }
 
 
 }
@@ -386,7 +393,7 @@ Statement structAssignmentStatement() :
 { Token structInstanceId; String constToken = null; java.util.Set<AssignmentStatement> definitions; }
 {
      structInstanceId = <ID> <ASSIGN> <LBRACE> definitions = structInitializer() <RBRACE> <SEMI>
-    { return new interpreter.ast.statement.struct.StructAssignmentStatement(structInstanceId.image, definitions, constToken); }
+    { return new StructAssignmentStatement(structInstanceId.image, definitions, constToken); }
 }
 
 Statement structVariableInitializeStatement() :
@@ -401,7 +408,7 @@ Statement structVariableInitializeStatement() :
 Statement expressionStatement() :
 { Expression expression = null; }
 {
-	expression = expression() <SEMI> { return new ExpressionStatement(expression); } |
+	expression = expression() { return new ExpressionStatement(expression); } |
 	<SEMI> { return new ExpressionStatement(expression); }
 }
 
@@ -540,7 +547,7 @@ Statement breakStatement() :
 {}
 {
 	<BREAK> <SEMI>
-	{ return new BreakStatement(); }
+	{ return new interpreter.ast.statement.flow_control.BreakStatement(); }
 }
 
 Statement continueStatement() :
@@ -559,7 +566,7 @@ Statement printStatement() :
 }
 
 Expression expression() :
-{ Expression e; }
+{ Expression e; Token t; }
 {
 	e = logicalOr() { return e; }
 }
@@ -579,7 +586,7 @@ Expression logicalAnd() :
 {
 	e1 = equalityExpression()
 	(
-	    <AND> e2 = equalityExpression() { e1 = new LogicalAND(e1, e2); }
+	    <AND> e2 = equalityExpression() { e1 = new interpreter.ast.expression.logical.LogicalAND(e1, e2); }
 	)*
 
 	{ return e1; }
@@ -622,7 +629,7 @@ Expression additiveExpression() :
         LOOKAHEAD(2)
 	    (
 	        <PLUS> e2 = multiplicativeExpression() { e1 = new PlusExpression(e1, e2); } |
-	        <MINUS> e2 = multiplicativeExpression() { e1 = new MinusExpression(e1, e2); }
+	        <MINUS> e2 = multiplicativeExpression() { e1 = new interpreter.ast.expression.arithmetic.additive.MinusExpression(e1, e2); }
 	    )
 	)*
 	{ return e1; }
@@ -670,17 +677,27 @@ Expression postfixExpression() :
 }
 
 Expression primaryExpression() :
-{Expression e1,e2; Token t = null;}
+{Expression e1,e2; Token t = null; Expression primaryExpressionPrime = null;}
 {
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
-	 | <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
-	 | t = <ID>  { return new IdExpression(t.image); }
+	 |
+	  <LPAREN> e1 = expressionList() <RPAREN> { return new PrimaryExpression(e1, t.image); }
+
+	 |
+      LOOKAHEAD(3)
+      t = <ID> primaryExpressionPrime = primaryExpressionPrime()
+       {
+         if(primaryExpressionPrime == null)
+             return new IdExpression(t.image);
+         else
+            return new FunctionCall(t.image, primaryExpressionPrime);
+        }
 }
 
 Expression primaryExpressionPrime() :
 { Expression e1 = null; }
 {
-	(<LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
+	(LOOKAHEAD(2) <LPAREN> e1 =  expressionList() <RPAREN> { return new PrimaryExpressionPrime(e1); })?
 	{ return  e1; }
 }
 

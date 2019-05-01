@@ -1,5 +1,8 @@
 package interpreter;
 
+import interpreter.ast.globalscope.FunctionDefinitionDefinition;
+import interpreter.ast.globalscope.FunctionDefinitionDefinition;
+
 import java.util.*;
 
 @SuppressWarnings("unchecked")
@@ -8,6 +11,7 @@ public class Table {
     static Hashtable[] table = new Hashtable[1000];
     static Hashtable[] structDefinitionsTable = new Hashtable[1000];
     static Hashtable[] structInstancesTable = new Hashtable[1000];
+    static Hashtable[] functionDefinitionsTable = new Hashtable[1000];
 
 
     public static void beginScope() {
@@ -26,6 +30,17 @@ public class Table {
 
     public static Object get(String id) {
         return (table[Table.fp].get(id));
+    }
+
+    public static void addFunctionDefinition(FunctionDefinitionDefinition functionDefinition){
+        if(functionDefinitionsTable[0] == null)
+            functionDefinitionsTable[0] = new Hashtable();
+        String functionId = functionDefinition.getId();
+        functionDefinitionsTable[0].put(functionId, functionDefinition);
+    }
+
+    public static Object getFunctionDefinition(String functionId) {
+        return functionDefinitionsTable[0].get(functionId);
     }
 
     public static void addStructDefinition(String structId, Map<String, Object> structVariables) {

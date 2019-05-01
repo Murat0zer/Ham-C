@@ -1,10 +1,13 @@
 package interpreter.visitor._switch;
 
-import interpreter.ast.expression.BoolExpression;
+import interpreter.ast.expression.logical.BoolExpression;
 import interpreter.ast.statement._switch.LabelBlock;
 import interpreter.ast.statement._switch.LabelStatement;
 import interpreter.ast.statement._switch.SwitchBlock;
 import interpreter.ast.statement._switch.SwitchStatement;
+import interpreter.visitor.VisitorVisitor;
+import interpreter.visitor.struct.GlobalStructUnit;
+import interpreter.visitor.struct.StructStatement;
 
 import java.util.Objects;
 
@@ -12,8 +15,13 @@ public class SwitchVisitorImpl implements SwitchVisitor {
 
 
     @Override
-    public Object visit(SwitchUnit switchUnit) {
-        return switchUnit.accept(this);
+    public Object visit(GlobalStructUnit globalStructUnit) {
+        return globalStructUnit.accept(this);
+    }
+
+    @Override
+    public Object visit(StructStatement structStatement) {
+        return structStatement.accept(this);
     }
 
     @Override
