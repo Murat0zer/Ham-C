@@ -147,7 +147,7 @@ AbstractGlobalScopeUnit functionDefinition() :
 {
 	returnType = returnType() t = <ID> <LPAREN> parameterList = parameterList() <RPAREN> body = compoundStatement()
 
-    { return new FunctionDefinitionDefinition(returnType, t.image, parameterList, body );  }
+    { return new FunctionDefinition(returnType, t.image, parameterList, body );  }
 }
 
 String returnType() :
@@ -681,7 +681,7 @@ Expression primaryExpression() :
 {
 	   e1 = constantExpression() { return new ConstantExpression(e1); }
 	 |
-	  <LPAREN> e1 = expressionList() <RPAREN> { return new PrimaryExpression(e1, t.image); }
+	  <LPAREN> e1 = expression() <RPAREN> { return new PrimaryExpression(e1, t.image); }
 
 	 |
       LOOKAHEAD(3)

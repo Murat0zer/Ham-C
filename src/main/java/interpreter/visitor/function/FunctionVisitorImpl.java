@@ -1,16 +1,16 @@
 package interpreter.visitor.function;
 
+import interpreter.MyInterpreter;
 import interpreter.Table;
 import interpreter.ast.Variable;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.expression.ExpressionList;
-import interpreter.ast.expression.PrimaryExpression;
 import interpreter.ast.expression.PrimaryExpressionPrime;
-import interpreter.ast.globalscope.FunctionDefinitionDefinition;
-import interpreter.ast.statement.Statement;
 import interpreter.ast.expression.function.FunctionCall;
-import interpreter.ast.statement.StatementList;
+import interpreter.ast.globalscope.FunctionDefinition;
+import interpreter.ast.statement.Statement;
 import interpreter.visitor.VisitorVisitor;
+import javafx.scene.control.Tab;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 
 public class FunctionVisitorImpl implements FunctionVisitor {
 
-
+    public static int functionCallCount = 0;
     @Override
     public Object visit(FunctionDefinitionUnit functionDefinitionUnit) {
         return functionDefinitionUnit.accept(this);
@@ -31,7 +31,7 @@ public class FunctionVisitorImpl implements FunctionVisitor {
     }
 
     @Override
-    public Object visit(FunctionDefinitionDefinition functionDefinition) {
+    public Object visit(FunctionDefinition functionDefinition) {
 
         Table.addFunctionDefinition(functionDefinition);
         return null;
@@ -40,35 +40,35 @@ public class FunctionVisitorImpl implements FunctionVisitor {
     @Override
     public Object visit(FunctionCall functionCall) {
 
-        FunctionDefinitionDefinition functionDefinition;
-        functionDefinition = (FunctionDefinitionDefinition) Table.getFunctionDefinition(functionCall.getFunctionId());
+        FunctionDefinition functionDefinition;
+        functionDefinition = (FunctionDefinition) Table.getFunctionDefinition(functionCall.getFunctionId());
 
         Map<String, Object> functionParameters = new HashMap<>();
 
         Optional<Expression> opPrimaryExpPrime = Optional.ofNullable(functionCall.getPrimaryExpressionPrime());
         PrimaryExpressionPrime primaryExpressionPrime = (PrimaryExpressionPrime) opPrimaryExpPrime.orElse(null);
 
-        Optional<Expression> opExpList = primaryExpressionPrime !=null ?
+        Optional<Expression> opExpList = primaryExpressionPrime != null ?
                 Optional.ofNullable(primaryExpressionPrime.getExp()) : Optional.empty();
 
-        ExpressionList expList =  (ExpressionList) opExpList.orElse(null);
+        ExpressionList expList = (ExpressionList) opExpList.orElse(null);
 
         List<Variable> variables;
         List<Expression> passedParameters = new ArrayList<>();
 
         if (expList != null) {
-            while(expList.getE1() != null) {
+            while (expList.getE1() != null) {
 
                 Expression expression;
                 passedParameters.add(expList.getE1());
 
-                Optional<Expression> opExp =  Optional.ofNullable(expList.getE2());
+                Optional<Expression> opExp = Optional.ofNullable(expList.getE2());
 
-                expression =  opExp.orElse(null);
+                expression = opExp.orElse(null);
 
-                if(expression instanceof  ExpressionList)
+                if (expression instanceof ExpressionList)
                     expList = (ExpressionList) expression;
-                else if (expression !=null ) {
+                else if (expression != null) {
                     passedParameters.add(expression);
                     break;
                 } else
@@ -81,23 +81,35 @@ public class FunctionVisitorImpl implements FunctionVisitor {
         optionalVariables = Optional.ofNullable((List<Variable>) functionDefinition.getParameterList());
         variables = optionalVariables.orElse(null);
 
-        if(variables != null) {
+        if (variables != null) {
             functionParameters = IntStream.range(0, variables.size())
                     .boxed()
                     .collect(Collectors
                             .toMap(i -> variables.get(i).getId(),
-                                    i -> passedParameters.get(i).accept(new VisitorVisitor())));
+                                    i -> passedParameters.get(i).accept(MyInterpreter.visitorSelector)));
 
+        }
+
+        String uniqueId = UUID.randomUUID().toString();
+        if(!functionDefinition.getId().equals("main")) {
+            String callerId = Table.get("callee_id").toString();
+            Table.beginScope();
+            Table.add("caller_id",callerId);
+            Table.add("callee_id", uniqueId);
+            Table.add("return", false);
+            Table.add("break", false);
+            Table.add("continue", false);
+            functionCallCount++;
+        } else {
+            Table.add("return", false);
+            Table.add("break", false);
+            Table.add("continue", false);
         }
 
 
         Object returnObject;
-        Table.beginScope();
 
-        Table.add("break", false);
-        Table.add("continue", false);
-
-        VisitorVisitor visitor = new VisitorVisitor();
+        VisitorVisitor visitor = MyInterpreter.visitorSelector;
         functionParameters.forEach(Table::add);
 
         Statement statementList = functionDefinition.getStatementList();

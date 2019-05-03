@@ -1,9 +1,7 @@
 package interpreter.ast.statement.struct;
 
-import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
-import interpreter.ast.statement.Statement;
 import interpreter.ast.statement.VariableDeclarationStatement;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.struct.StructStatement;
 import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;

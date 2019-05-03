@@ -1,17 +1,16 @@
 package interpreter.visitor.struct;
 
+import interpreter.MyInterpreter;
 import interpreter.Table;
 import interpreter.Util;
 import interpreter.ast.expression.ExpressionList;
 import interpreter.ast.expression.IdExpression;
 import interpreter.ast.expression.PostfixExpression;
-import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.struct.*;
 import interpreter.ast.statement.struct.StructAssignmentStatement;
 import interpreter.ast.statement.struct.StructDeclarationStatement;
 import interpreter.ast.statement.struct.StructDefinitionStatement;
 import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
-import interpreter.visitor.VisitorVisitor;
 
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class StructVisitorImpl  implements StructVisitor  {
         String structInstanceId = globalStructDeclaration.getStructInstanceId();
 
         Map<String, Object> newStructVariables;
-        newStructVariables = Util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), new VisitorVisitor());
+        newStructVariables = Util.getVariableDeclarationMap(globalStructDeclaration.getStatements(), MyInterpreter.visitorSelector);
 
         Map<String, Object> defaultStructVariables;
         int tempFp = Table.fp;

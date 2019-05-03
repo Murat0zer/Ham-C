@@ -1,9 +1,8 @@
 package interpreter.ast.statement.iteration;
 
-import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.statement.Statement;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.iteration.IterationUnit;
 import interpreter.visitor.iteration.IterationVisitor;
 import lombok.AllArgsConstructor;

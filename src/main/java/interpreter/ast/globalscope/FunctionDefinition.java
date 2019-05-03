@@ -1,8 +1,7 @@
 package interpreter.ast.globalscope;
 
-import interpreter.visitor.AbstractVisitor;
 import interpreter.ast.statement.Statement;
-import interpreter.visitor.function.FunctionDefinitionUnit;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.function.FunctionDefinitionUnit;
 import interpreter.visitor.function.FunctionVisitor;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FunctionDefinitionDefinition implements FunctionDefinitionUnit {
+public class FunctionDefinition implements FunctionDefinitionUnit {
 
     private String returnType;
     private String id;

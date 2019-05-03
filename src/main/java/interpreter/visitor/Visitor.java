@@ -2,7 +2,6 @@ package interpreter.visitor;
 
 import interpreter.ast.CompoundStatement;
 import interpreter.ast.expression.*;
-import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.ast.globalscope.GlobalVariableDeclaration;
 import interpreter.ast.globalscope.SimpleInitializer;
 import interpreter.ast.statement.*;

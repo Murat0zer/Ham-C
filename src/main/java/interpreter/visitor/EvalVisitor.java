@@ -1,5 +1,6 @@
 package interpreter.visitor;
 
+import interpreter.MyInterpreter;
 import interpreter.Table;
 import interpreter.Util;
 import interpreter.ast.CompoundStatement;
@@ -45,21 +46,41 @@ public class EvalVisitor extends VisitorVisitor implements Visitor  {
 
     public Object visit(StatementList s) {
 
-        if (s.getStatement() instanceof ReturnStatement)
-            return ((ReturnStatement) s.getStatement()).getExpression().accept(this);
 
-        Object statementList = null;
-        Object statement =  s.getStatement().accept(this);
+        StatementList newStatementList = new StatementList();
+        if (s.getStatement() instanceof ReturnStatement){
+            newStatementList.setStatement(s.getStatement());
+            return ((ReturnStatement) newStatementList.getStatement()).getExpression().accept(this);
+        }
+
+
+        Object statementList = new Object();
+        Object val = s.getStatement().accept(MyInterpreter.visitorSelector);
+
+        if((boolean) Table.get("return")){
+            return val;
+        }
 
         Table.add("break", false);
         Table.add("continue", false);
 
-        if (Objects.nonNull(s.getStatementList()))
-            statementList = s.getStatementList().accept(this);
+        if(Objects.nonNull(s.getStatementList())) {
+            statementList = s.getStatementList();
 
-        if(statementList instanceof Statement)
-            return new StatementList((Statement) statement, (Statement) statementList);
-        return statementList;
+            if (statementList instanceof ReturnStatement)
+                return ((ReturnStatement) statementList).accept(MyInterpreter.visitorSelector);
+            if (statementList instanceof StatementList) {
+                newStatementList.setStatement(((StatementList) statementList).getStatement());
+                newStatementList.setStatementList(((StatementList) statementList).getStatementList());
+            } else if (statementList != null) {
+                newStatementList.setStatement((Statement) statementList);
+
+            }
+
+        }
+        else
+            return val;
+         return newStatementList.accept(MyInterpreter.visitorSelector);
     }
 
     public Object visit(Expression e) {

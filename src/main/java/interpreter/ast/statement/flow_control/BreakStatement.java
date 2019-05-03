@@ -2,7 +2,6 @@ package interpreter.ast.statement.flow_control;
 
 import interpreter.ast.statement.Statement;
 import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
 import interpreter.visitor.flow_control.FlowControlUnit;
 import interpreter.visitor.flow_control.FlowControlVisitor;
 import lombok.AllArgsConstructor;

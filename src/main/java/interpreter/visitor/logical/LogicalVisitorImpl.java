@@ -30,10 +30,9 @@ public class LogicalVisitorImpl extends VisitorVisitor implements LogicalVisitor
     @Override
     public Expression visit(LogicalOR e) {
 
-        Expression left = (Expression) e.getLeft().accept(this);
-        Expression right = (Expression) e.getRight().accept(this);
-        return new BoolExpression(
-                ((BoolExpression) left).isBoolValue() || ((BoolExpression) right).isBoolValue());
+        Boolean left = (Boolean) e.getLeft().accept(this);
+        Boolean right = (Boolean) e.getRight().accept(this);
+        return new BoolExpression(( left) || (right));
     }
 
     @Override

@@ -6,7 +6,6 @@ import interpreter.ast.statement.iteration.ForStatement;
 import interpreter.ast.statement.iteration.IterationStatement;
 import interpreter.ast.statement.iteration.WhileStatement;
 import interpreter.visitor.VisitorVisitor;
-import javafx.scene.control.Tab;
 
 public class IterationVisitorImpl extends VisitorVisitor implements IterationVisitor {
 
@@ -28,8 +27,11 @@ public class IterationVisitorImpl extends VisitorVisitor implements IterationVis
 
     @Override
     public Object visit(ForStatement statement) {
-
+        String calleeId = Table.get("callee_id").toString();
+        String callerId = Table.get("caller_id").toString();
         Table.beginScope();
+        Table.add("callee_id", calleeId);
+        Table.add("caller_id", callerId);
         Table.add("break", false);
         Table.add("continue", false);
         if (statement.getForIndex() != null)

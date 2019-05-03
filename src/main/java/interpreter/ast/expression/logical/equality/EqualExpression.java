@@ -1,7 +1,7 @@
 package interpreter.ast.expression.logical.equality;
 
-import interpreter.visitor.AbstractVisitor;
 import interpreter.ast.expression.Expression;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.logical.LogicalUnit;
 import interpreter.visitor.logical.LogicalVisitor;
 import lombok.AllArgsConstructor;

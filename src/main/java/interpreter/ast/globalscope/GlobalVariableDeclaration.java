@@ -1,8 +1,8 @@
 package interpreter.ast.globalscope;
 
+import interpreter.ast.expression.Expression;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.EvalVisitor;
-import interpreter.ast.expression.Expression;
 import interpreter.visitor.GlobalUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

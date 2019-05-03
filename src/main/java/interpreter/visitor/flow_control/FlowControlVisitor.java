@@ -1,5 +1,6 @@
 package interpreter.visitor.flow_control;
 
+import interpreter.MyInterpreter;
 import interpreter.ast.statement.flow_control.BreakStatement;
 import interpreter.ast.statement.flow_control.ContinueStatement;
 import interpreter.ast.statement.flow_control.IfStatement;
@@ -7,7 +8,6 @@ import interpreter.ast.statement.flow_control.ReturnStatement;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.ExpressionUnit;
 import interpreter.visitor.StatementUnit;
-import interpreter.visitor.VisitorVisitor;
 
 public interface FlowControlVisitor extends AbstractVisitor {
 
@@ -16,12 +16,12 @@ public interface FlowControlVisitor extends AbstractVisitor {
 
     @Override
     default Object visit(ExpressionUnit expressionUnit) {
-        return expressionUnit.accept(new VisitorVisitor());
+        return expressionUnit.accept(MyInterpreter.visitorSelector);
     }
 
     @Override
     default Object visit(StatementUnit statementUnit) {
-        return statementUnit.accept(new VisitorVisitor());
+        return statementUnit.accept(MyInterpreter.visitorSelector);
     }
 
     Object visit(ContinueStatement statement);

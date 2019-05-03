@@ -2,7 +2,6 @@ package interpreter.ast.expression.arithmetic.additive;
 
 import interpreter.ast.expression.Expression;
 import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
 import interpreter.visitor.arithmetic.ArithmeticUnit;
 import interpreter.visitor.arithmetic.ArithmeticVisitor;
 import lombok.Getter;

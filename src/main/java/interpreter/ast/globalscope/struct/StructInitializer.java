@@ -1,9 +1,8 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
 import interpreter.ast.expression.Expression;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

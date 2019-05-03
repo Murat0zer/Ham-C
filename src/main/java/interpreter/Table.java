@@ -1,9 +1,9 @@
 package interpreter;
 
-import interpreter.ast.globalscope.FunctionDefinitionDefinition;
-import interpreter.ast.globalscope.FunctionDefinitionDefinition;
+import interpreter.ast.globalscope.FunctionDefinition;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class Table {
@@ -32,7 +32,7 @@ public class Table {
         return (table[Table.fp].get(id));
     }
 
-    public static void addFunctionDefinition(FunctionDefinitionDefinition functionDefinition){
+    public static void addFunctionDefinition(FunctionDefinition functionDefinition){
         if(functionDefinitionsTable[0] == null)
             functionDefinitionsTable[0] = new Hashtable();
         String functionId = functionDefinition.getId();

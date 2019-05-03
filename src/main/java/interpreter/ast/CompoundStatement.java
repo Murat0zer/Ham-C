@@ -1,8 +1,8 @@
 package interpreter.ast;
 
+import interpreter.ast.statement.Statement;
 import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.EvalVisitor;
-import interpreter.ast.statement.Statement;
 import interpreter.visitor.StatementUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

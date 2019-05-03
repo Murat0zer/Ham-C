@@ -1,8 +1,6 @@
 package interpreter.ast.expression.constant;
 
 import interpreter.visitor.AbstractVisitor;
-import interpreter.visitor.EvalVisitor;
-import interpreter.visitor.ExpressionUnit;
 import interpreter.visitor.constant.ConstantUnit;
 import interpreter.visitor.constant.ConstantVisitor;
 import lombok.Getter;

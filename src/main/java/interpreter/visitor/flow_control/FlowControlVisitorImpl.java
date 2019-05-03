@@ -1,5 +1,6 @@
 package interpreter.visitor.flow_control;
 
+import interpreter.MyInterpreter;
 import interpreter.Table;
 import interpreter.ast.statement.flow_control.BreakStatement;
 import interpreter.ast.statement.flow_control.ContinueStatement;
@@ -17,16 +18,25 @@ public class FlowControlVisitorImpl implements FlowControlVisitor {
     @Override
     public Object visit(IfStatement statement) {
 
-        Object boolExp = statement.getBoolExpression().accept(this);
+        Boolean result = (Boolean) statement.getBoolExpression().accept(MyInterpreter.visitorSelector);
+        String calleeId = Table.get("callee_id").toString();
+        String callerId = Table.get("caller_id").toString();
         Table.beginScope();
-        if ((boolean) boolExp) {
-            statement.getTrueBlock().accept(this);
+        Table.add("callee_id", calleeId);
+        Table.add("caller_id", callerId);
+        Table.add("return", false);
+        Table.add("break", false);
+        Table.add("continue", false);
+
+        Object val = null;
+        if (result) {
+          val =  statement.getTrueBlock().accept(MyInterpreter.visitorSelector);
         } else if (statement.getElseBlock() != null) {
-            statement.getElseBlock().accept(this);
+           val = statement.getElseBlock().accept(MyInterpreter.visitorSelector);
         }
         Table.endScope();
 
-        return null;
+        return val;
     }
 
     @Override
@@ -41,8 +51,23 @@ public class FlowControlVisitorImpl implements FlowControlVisitor {
         return null;
     }
 
+    /**
+     *  Return true ifadesi fonksiyonun scope u da dahil tum scopelardaki return degerlerini true yapmalidir.
+     *  Boylece fonksiyonun diger statementleri isleme alinmaz.
+     * @param statement
+     * @return
+     */
     @Override
     public Object visit(ReturnStatement statement) {
-        return statement.getExpression().accept(this);
+
+        String id = String.valueOf(Table.get("callee_id"));
+
+        int tempFp = Table.fp;
+        while (id.equals(Table.get("callee_id").toString())) {
+            Table.add("return", true);
+            Table.fp--;
+        }
+        Table.fp = tempFp;
+        return statement.getExpression().accept(MyInterpreter.visitorSelector);
     }
 }

@@ -1,7 +1,6 @@
 
 package interpreter.visitor;
 
-import interpreter.ast.expression.Expression;
 import interpreter.ast.globalscope.AbstractGlobalScopeUnit;
 import interpreter.visitor._switch.SwitchUnit;
 import interpreter.visitor.arithmetic.ArithmeticUnit;

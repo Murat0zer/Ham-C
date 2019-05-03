@@ -1,7 +1,6 @@
 package interpreter.visitor.arithmetic;
 
 import interpreter.ast.expression.ExponentialExpression;
-import interpreter.ast.expression.arithmetic.additive.AdditiveExpression;
 import interpreter.ast.expression.arithmetic.additive.MinusExpression;
 import interpreter.ast.expression.arithmetic.additive.PlusExpression;
 import interpreter.ast.expression.arithmetic.multiplicative.DivideExpression;

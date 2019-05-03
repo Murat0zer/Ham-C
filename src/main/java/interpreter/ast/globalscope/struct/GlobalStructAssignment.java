@@ -1,7 +1,7 @@
 package interpreter.ast.globalscope.struct;
 
-import interpreter.visitor.AbstractVisitor;
 import interpreter.ast.statement.AssignmentStatement;
+import interpreter.visitor.AbstractVisitor;
 import interpreter.visitor.struct.GlobalStructUnit;
 import interpreter.visitor.struct.StructVisitor;
 import lombok.AllArgsConstructor;
