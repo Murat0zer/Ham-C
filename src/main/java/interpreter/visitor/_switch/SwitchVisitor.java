@@ -16,6 +16,9 @@ public interface SwitchVisitor extends AbstractVisitor {
     @Override
     Object visit(StructStatement structStatement);
 
+    @Override
+    Object visit(SwitchUnit switchUnit);
+
     Object visit(LabelStatement statement);
 
     Object visit(SwitchBlock statement);

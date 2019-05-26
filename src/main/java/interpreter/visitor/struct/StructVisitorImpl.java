@@ -14,7 +14,7 @@ import interpreter.ast.statement.struct.StructVariableAssignmentStatement;
 
 import java.util.Map;
 
-public class StructVisitorImpl  implements StructVisitor  {
+public class StructVisitorImpl implements StructVisitor  {
 
 
     @Override
@@ -38,7 +38,7 @@ public class StructVisitorImpl  implements StructVisitor  {
             Table.beginScope();
 
         Map<String, Object> structDefaultVariables;
-        structDefaultVariables = Util.getVariableDeclarationMap(globalStructDefinition.getStatements(), this);
+        structDefaultVariables = Util.getVariableDeclarationMap(globalStructDefinition.getStatements(), MyInterpreter.visitorSelector);
         String structId = globalStructDefinition.getStructId();
         Table.addStructDefinition(structId, structDefaultVariables);
         return null;

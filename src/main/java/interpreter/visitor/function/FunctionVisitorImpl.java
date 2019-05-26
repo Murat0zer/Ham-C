@@ -10,7 +10,6 @@ import interpreter.ast.expression.function.FunctionCall;
 import interpreter.ast.globalscope.FunctionDefinition;
 import interpreter.ast.statement.Statement;
 import interpreter.visitor.VisitorVisitor;
-import javafx.scene.control.Tab;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,7 +105,6 @@ public class FunctionVisitorImpl implements FunctionVisitor {
             Table.add("continue", false);
         }
 
-
         Object returnObject;
 
         VisitorVisitor visitor = MyInterpreter.visitorSelector;
@@ -114,7 +112,6 @@ public class FunctionVisitorImpl implements FunctionVisitor {
 
         Statement statementList = functionDefinition.getStatementList();
         returnObject = statementList.accept(visitor);
-
 
         Table.endScope();
         return returnObject;

@@ -1,5 +1,6 @@
 package interpreter.visitor._switch;
 
+import interpreter.MyInterpreter;
 import interpreter.ast.expression.logical.BoolExpression;
 import interpreter.ast.statement._switch.LabelBlock;
 import interpreter.ast.statement._switch.LabelStatement;
@@ -14,19 +15,24 @@ public class SwitchVisitorImpl implements SwitchVisitor {
 
 
     @Override
+    public Object visit(SwitchUnit switchUnit) {
+        return switchUnit.accept(this);
+    }
+
+    @Override
     public Object visit(GlobalStructUnit globalStructUnit) {
-        return globalStructUnit.accept(this);
+        return globalStructUnit.accept(MyInterpreter.visitorSelector);
     }
 
     @Override
     public Object visit(StructStatement structStatement) {
-        return structStatement.accept(this);
+        return structStatement.accept(MyInterpreter.visitorSelector);
     }
 
     @Override
     public Object visit(LabelStatement statement) {
 
-        return statement.getStatementList().accept(this);
+        return statement.getStatementList().accept(MyInterpreter.visitorSelector);
     }
 
 
@@ -44,7 +50,7 @@ public class SwitchVisitorImpl implements SwitchVisitor {
         // eger default label ise ignore ediyoruz.
         if (!isDefaultLabel.isBoolValue())
             SwitchBlock.setIsCaseFound(
-                    new BoolExpression(Objects.nonNull(statement.getLabelBlock().accept(this))));
+                    new BoolExpression(Objects.nonNull(statement.getLabelBlock().accept(MyInterpreter.visitorSelector))));
 
         // eger null ise. butun switch caseleri denenmis ve istenilen sonuc bulunamamistir.
         boolean hasMoreLabelBlocks;
@@ -52,29 +58,29 @@ public class SwitchVisitorImpl implements SwitchVisitor {
 
 
         if (!SwitchBlock.getIsCaseFound().isBoolValue() && hasMoreLabelBlocks) {
-            statement.getSwitchBlock().accept(this);
+            statement.getSwitchBlock().accept(MyInterpreter.visitorSelector);
             return null;
         }
         boolean isDefaultCaseExists = Objects.nonNull(SwitchBlock.getDefaultStatement());
         if (!SwitchBlock.getIsCaseFound().isBoolValue() && !hasMoreLabelBlocks && isDefaultCaseExists)
-            SwitchBlock.getDefaultStatement().accept(this);
+            SwitchBlock.getDefaultStatement().accept(MyInterpreter.visitorSelector);
         return null;
     }
 
     @Override
     public Object visit(SwitchStatement statement) {
 
-        return statement.getSwitchBlock().accept(this);
+        return statement.getSwitchBlock().accept(MyInterpreter.visitorSelector);
     }
 
     @Override
     public Object visit(LabelBlock statement) {
 
-        Object labelExpression = statement.getLabelExpression().accept(this);
-        Object switchExpression = statement.getSwitchExpression().accept(this);
+        Object labelExpression = statement.getLabelExpression().accept(MyInterpreter.visitorSelector);
+        Object switchExpression = statement.getSwitchExpression().accept(MyInterpreter.visitorSelector);
 
         if (labelExpression.equals(switchExpression))
-            return statement.getLabelStatement().accept(this);
+            return statement.getLabelStatement().accept(MyInterpreter.visitorSelector);
 
         return null;
     }

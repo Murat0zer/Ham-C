@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
+
 
 public class MyInterpreter {
 
@@ -24,7 +24,6 @@ public class MyInterpreter {
 
             File initialFile = new File("program.hc");
             InputStream targetStream = new FileInputStream(initialFile);
-
 
             new Parser(targetStream);
             List<AbstractGlobalScopeUnit> abstractGlobalScopeUnits = Parser.start();

@@ -46,7 +46,6 @@ public class EvalVisitor extends VisitorVisitor implements Visitor  {
 
     public Object visit(StatementList s) {
 
-
         StatementList newStatementList = new StatementList();
         if (s.getStatement() instanceof ReturnStatement){
             newStatementList.setStatement(s.getStatement());

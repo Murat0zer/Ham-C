@@ -40,28 +40,34 @@ public class Util {
 
     public static void setScopeFor(String structInstanceId) {
 
-        Object value = Table.getStructInstance(structInstanceId);
+        Object value = null;
         while (Objects.isNull(value)) {
+            try {
+                value = Table.getStructInstance(structInstanceId);
+            } catch (Exception e){
                 log.trace("Cannot find struct in this scope. Checking higher scopes...");
                 Table.fp--;
                 if (Table.fp == -1) {
                     log.error("Struct does not exist = {}", structInstanceId);
                     break;
                 }
-            value = Table.getStructInstance(structInstanceId);
+            }
         }
     }
 
     public static void setScopeForStructDefinition(String structId) {
-        Object value = Table.getStructDefinition(structId);
+        Object value = null;
         while (Objects.isNull(value)) {
-            log.trace("Cannot find struct Definition in this scope. Checking higher scopes...");
-            Table.fp--;
-            if (Table.fp == -1) {
-                log.error("Struct Definition does not exist = {}", structId);
-                break;
+            try {
+                value = Table.getStructDefinition(structId);
+            } catch (Exception e) {
+                log.trace("Cannot find struct Definition in this scope. Checking higher scopes...");
+                Table.fp--;
+                if (Table.fp == -1) {
+                    log.error("Struct Definition does not exist = {}", structId);
+                    break;
+                }
             }
-            value = Table.getStructDefinition(structId);
         }
     }
 
@@ -83,23 +89,23 @@ public class Util {
 
         statementSet.forEach(variableDeclarationStatement -> {
 
-            Method methodGetValue;
-            Method methodGetId;
+            Method getValueMethod;
+            Method getIdMethod;
 
             String id;
             Expression expression;
 
             try {
-                methodGetValue = variableDeclarationStatement.getClass().getDeclaredMethod("getValueExp");
-                methodGetId = variableDeclarationStatement.getClass().getDeclaredMethod("getId");
-                expression = (Expression) methodGetValue.invoke(variableDeclarationStatement);
-                id = (String) methodGetId.invoke(variableDeclarationStatement);
+                getValueMethod = variableDeclarationStatement.getClass().getDeclaredMethod("getValueExp");
+                getIdMethod = variableDeclarationStatement.getClass().getDeclaredMethod("getId");
+                expression = (Expression) getValueMethod.invoke(variableDeclarationStatement);
+                id = (String) getIdMethod.invoke(variableDeclarationStatement);
 
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 log.error(e.getMessage(), e);
                 return;
             }
-            Object value = expression.accept(visitor);
+            Object value = expression == null ? null : expression.accept(visitor);
             variableMap.put(id, value);
         });
 
