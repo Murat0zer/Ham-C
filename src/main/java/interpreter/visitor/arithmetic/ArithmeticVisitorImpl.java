@@ -11,9 +11,7 @@ import interpreter.ast.expression.constant.DoubleConst;
 import interpreter.ast.expression.constant.IntConst;
 import interpreter.ast.expression.constant.StrConst;
 import interpreter.ast.statement.Statement;
-import interpreter.ast.statement.StatementList;
 import interpreter.visitor.VisitorVisitor;
-import interpreter.visitor.constant.ConstantUnit;
 
 public class ArithmeticVisitorImpl extends VisitorVisitor implements ArithmeticVisitor {
 
@@ -50,7 +48,7 @@ public class ArithmeticVisitorImpl extends VisitorVisitor implements ArithmeticV
         expression.setRightType(right.getClass().getSimpleName());
 
         if (expression.getLeftType().equals("String") || expression.getRightType().equals("String")) {
-            return new StrConst(((String) left) + right).getValue();
+            return new StrConst( String.valueOf(left) + String.valueOf(right)).getValue();
         } else if (expression.getLeftType().equals("Integer") || expression.getRightType().equals(
                 "Integer"))
             return new IntConst((Integer) left + (Integer) right).getConstInt();
